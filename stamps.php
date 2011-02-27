@@ -39,23 +39,17 @@ class Stamp {
 		return $this->paste("");
 	}
 
-	public function pasteInto( $paste, $where ) {
-		if ($this->hasSimpleSlot($where)) { 
-			$this->put($where,$paste);
-			
-			return $this;
-		}
-		else {
-			$keys = $this->find($where);
-			$suffix = substr($this->tpl,$keys["padEnd"]+$keys["padBegin"]);
-			$prefix = substr($this->tpl,0,$keys["begin"]);
-			$copy = $prefix.$paste.$suffix;
-			$this->tpl = $copy;
-		}
+	public function replace( $where, $paste ) {
+		$keys = $this->find($where);
+		$suffix = substr($this->tpl,$keys["padEnd"]+$keys["padBegin"]);
+		$prefix = substr($this->tpl,0,$keys["begin"]);
+		$copy = $prefix.$paste.$suffix;
+		$this->tpl = $copy;
 		return $this; //new Stamp( $copy );
 	}
 
 	public function put($slotID, $text) {
+		$text = htmlentities($text);
 		$slotFormat = "#$slotID#";
 		$this->tpl = str_replace( $slotFormat, $text, $this->tpl);
 		return $this;
@@ -86,78 +80,47 @@ class Stamp {
 
 }
 
-$template = '
-	<!-- table -->
-		<table border=1>
-			<!-- row -->
-			<tr>
-				<!-- cell -->
-				<td><b>#placeholder#</b></td>
-				<!-- /cell -->
-			</tr>
-			<!-- /row -->
-			<!-- row-odd --><tr style="background-color:#ddd;">#cell#</tr><!-- /row-odd -->
-		</table>
-	<!-- /table -->
-';
 
-echo $template;
-
-$s = new Stamp( $template );
-
-$matrix = array(
-	array("John","Developer"),array("Joseph","Marketeer"),array("Burt","Gardener")
-);
-
-
-$table = $s->copy("table");
-$j=0;
-foreach($matrix as $person) {
-	$cols = "";
-	foreach($person as $info) {
-		$cols .= (string) $s->copy("cell")->put("placeholder",$info);
-	}
-	$rows .= (string) $s->copy("row".(($j++ % 2) ? "":"-odd"))->pasteInto($cols,"cell");
-}
-echo $table->pastePad($rows);
-
-
-/**
-
- <ul>
- <?php foreach($listItems as $listItem) { ?>
- 	<li>
- 	   <?php echo $listItem; ?>
-    </li>
- <?php } ?>
- </ul>	
-
- */
+/** EXAMPLES
+$current = "news";
+$tabs = array("home.html"=>"homepage","news.html"=>"news","about.html"=>"about");
+?>
+  <ul class="tabs">
+  	<?php foreach($tabs as $lnk=>$t): ?>
+  		<li>
+  			<a class="
+  				<?php if ($current==$t): ?>
+  					active
+  				<?php else: ?>
+  					inactive
+  				<?php endif; ?>
+  			" href="<?php echo $lnk; ?>">
+  				<?php echo $t; ?>
+  			</a>
+  		</li>
+ 	<?php endforeach; ?>
+ </ul>
+<?php
 
 $template = '
 
-
-	<ul>
-		<!-- item --><li>#listItem#</li><!-- /item -->
+	<ul class="tabs">
+		<!-- tab -->
+			<li>
+				<a class="#active#" href="#href#">#tab#</a>
+			</li>
+		<!-- /tab -->
 	</ul>
+	
 
 ';
 
-echo $template;
-
-
-$todo = array("clean house", "do homework", "go to comic store");
+$tabs = array("home.html"=>"homepage","news.html"=>"news","about.html"=>"about");
 $s = new Stamp($template);
+$current = "news";
 
+foreach($tabs as $lnk=>$t)
+	$menu .= $s->copy("tab")->put("href",$lnk)->put("tab",$t)->put("active",($current==$t)?"active":"inactive");
 
-foreach($todo as $task) {
-	$listItems .= $s->copy("item")->pasteInto($task,"listItem");
-}
-echo $s->pastePad($listItems);
-
-
-
-
-
-//print_r($table);
-
+echo $s->replace("tab",$menu);
+**/
