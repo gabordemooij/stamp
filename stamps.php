@@ -1,17 +1,62 @@
 <?php
-
-//Stamp
-//A template Engine by Gabor de Mooij (G.J.G.T de Mooij)
-//Licensed New BSD
-
+/**
+ * Stamp Template Engine
+ * Compact Pure HTML Template Engine
+ *
+ * @file			Stamp
+ * @description		Stamp Template Engine, Main Class
+ *
+ * @author			Gabor de Mooij
+ * @license			BSD
+ *
+ * (c) G.J.G.T. (Gabor) de Mooij
+ * This source file is subject to the BSD/GPLv2 License that is bundled
+ * with this source code in the file license.txt.
+ */
 class Stamp {
+
+	/**
+	 * @var string
+	 * Holds base template string
+	 */
 	private $tpl = "";
+
+	/**
+	 * @var array
+	 */
 	private $fcache = array();
+
+	/**
+	 * Constructor
+	 * 
+	 * @param  string $templ template string
+	 *
+	 * @return void
+	 */
 	public function __construct($templ) {
 		$this->tpl=$templ;
 
 	}
 
+	/**
+	 * Finds a region in the template marked by the comment markers
+	 * <!-- marker --> this area will be selected <!-- /marker -->
+	 *
+	 * This method returns a Region Struct:
+	 *
+	 * array(
+	 * 	"begin" => $begin -- begin of region (string position),
+	 *  "padBegin" => $padBegin -- begin of actual inner HTML (without the begin marker itself)
+	 * 	"end" => $end -- end of region before end marker
+	 *  "padEnd" => -- end of region after end marker
+	 * 	"copy" => -- inner HTML between markers
+	 *
+	 * );
+	 *
+	 * @param  string $id marker ID
+	 *
+	 * @return array $struct
+	 */
 	public function find( $id ) {
 		if (isset($this->fcache[$id])) {
 			return $this->fcache[$id];
@@ -30,15 +75,36 @@ class Stamp {
 		return $keys;
 	}
 
+	/**
+	 * Returns a new Stamp Template, containing a copy of the
+	 * specified region ID.
+	 *
+	 * @param  string $id region id
+	 * 
+	 * @return Stamp $stamp the new Stamp instance
+	 */
 	public function copy($id) {
 		$snip = $this->find($id);
 		return new Stamp( $snip["copy"] );
 	}
 
+	/**
+	 * Cleans the contents of the current stamp
+	 * 
+	 * @return Stamp
+	 */
 	public function clean() {
 		return $this->paste("");
 	}
 
+	/**
+	 * Replace a region specified by $where region ID with string $paste.
+	 *
+	 * @param  string $where region ID
+	 * @param  string $paste replacement string
+	 *
+	 * @return Stamp stamp
+	 */
 	public function replace( $where, $paste ) {
 		$keys = $this->find($where);
 		$suffix = substr($this->tpl,$keys["padEnd"]+$keys["padBegin"]);
@@ -48,19 +114,41 @@ class Stamp {
 		return $this; //new Stamp( $copy );
 	}
 
+
+	/**
+	 * Puts $text in slot Slot ID, marker #slot# will be replaced.
+	 *
+	 * @param  string $slotID slot identifier
+	 * @param  string $text
+	 * 
+	 * @return Stamp
+	 */
 	public function put($slotID, $text) {
 		$text = htmlentities($text);
 		$slotFormat = "#$slotID#";
-		$this->tpl = str_replace( $slotFormat, $text, $this->tpl);
+		$this->tpl = str_replace( $slotFormat, htmlspecialchars( $text ), $this->tpl);
 		return $this;
 	}
 
+	/**
+	 * Checks if the template contains slot Slot ID.
+	 *
+	 * @param  string $slotID slot ID
+	 *
+	 * @return bool $containsSlot result of check
+	 */
 	public function hasSimpleSlot($slotID) {
 		if (strpos($this->tpl,"#".$slotID."#")!==false) return true; else return false;
 	}
 
 
-
+	/**
+	 * Pastes the contents of string $paste after the first '>'
+	 *
+	 * @param  $paste string HTML
+	 *
+	 * @return Stamp $chainable Chainable
+	 */
 	public function pastePad($paste) {
 		$beginOfTag = strpos($this->tpl,">");
 		$endOfTag = strrpos($this->tpl,"<");
@@ -68,12 +156,23 @@ class Stamp {
 		return $this;
 	}
 
-
+	/**
+	 * Pastes the contents of $paste in the template; replaces entire template.
+	 *
+	 * @param  string $paste string HTML
+	 *
+	 * @return Stamp $chainable Chainable
+	 */
 	public function paste( $paste ) {
 		$this->tpl = $paste;
 		return $this;
 	}
 
+	/**
+	 * Renders the contents of the template as a string
+	 * 
+	 * @return string $stringHTML HTML
+	 */
 	public function __toString() {
 		return (string) $this->tpl;
 	}
@@ -81,7 +180,7 @@ class Stamp {
 }
 
 
-/** EXAMPLES
+/** EXAMPLES **/
 $current = "news";
 $tabs = array("home.html"=>"homepage","news.html"=>"news","about.html"=>"about");
 ?>
@@ -123,4 +222,4 @@ foreach($tabs as $lnk=>$t)
 	$menu .= $s->copy("tab")->put("href",$lnk)->put("tab",$t)->put("active",($current==$t)?"active":"inactive");
 
 echo $s->replace("tab",$menu);
-**/
+/**/
