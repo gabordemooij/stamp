@@ -12,6 +12,7 @@
  * (c) G.J.G.T. (Gabor) de Mooij
  * This source file is subject to the BSD/GPLv2 License that is bundled
  * with this source code in the file license.txt.
+ *
  */
 class Stamp {
 
@@ -28,7 +29,7 @@ class Stamp {
 
 	/**
 	 * Constructor
-	 * 
+	 *
 	 * @param  string $templ template string
 	 *
 	 * @return void
@@ -80,7 +81,7 @@ class Stamp {
 	 * specified region ID.
 	 *
 	 * @param  string $id region id
-	 * 
+	 *
 	 * @return Stamp $stamp the new Stamp instance
 	 */
 	public function copy($id) {
@@ -90,7 +91,7 @@ class Stamp {
 
 	/**
 	 * Cleans the contents of the current stamp
-	 * 
+	 *
 	 * @return Stamp
 	 */
 	public function clean() {
@@ -120,7 +121,7 @@ class Stamp {
 	 *
 	 * @param  string $slotID slot identifier
 	 * @param  string $text
-	 * 
+	 *
 	 * @return Stamp
 	 */
 	public function put($slotID, $text) {
@@ -170,56 +171,44 @@ class Stamp {
 
 	/**
 	 * Renders the contents of the template as a string
-	 * 
+	 *
 	 * @return string $stringHTML HTML
 	 */
 	public function __toString() {
 		return (string) $this->tpl;
 	}
 
+	/**
+	 * Returns the list of markers in template
+	 *
+	 * @return array $markersList array
+	 */
+    private function getMarkersList() {
+        preg_match_all('#<!-- ([a-z0-9]+) -->#', $this->tpl,
+                        $markersGroups);
+        $markersList = array();
+        foreach($markersGroups[1] as $marker) {
+            if(strstr($this->tpl, "<!-- /$marker -->")) {
+                $markersList []= $marker;
+            }
+        }
+        return $markersList;
+    }
+
+	/**
+	 * Replaces all markers in current template with child's ones
+	 * (like reverse (to make it chainable) of Django's {% extends %})
+	 *
+	 * @return Stamp $chainable Chainable
+	 */
+    public function extendWith($childString) {
+        $child = new Stamp($childString);
+        $parent = $this;
+        foreach($child->getMarkersList() as $marker) {
+            $copyInChild = $child->copy($marker);
+            $parent->replace($marker, $copyInChild);
+        }
+        return $this;
+    }
+
 }
-
-
-/** EXAMPLES **/
-$current = "news";
-$tabs = array("home.html"=>"homepage","news.html"=>"news","about.html"=>"about");
-?>
-  <ul class="tabs">
-  	<?php foreach($tabs as $lnk=>$t): ?>
-  		<li>
-  			<a class="
-  				<?php if ($current==$t): ?>
-  					active
-  				<?php else: ?>
-  					inactive
-  				<?php endif; ?>
-  			" href="<?php echo $lnk; ?>">
-  				<?php echo $t; ?>
-  			</a>
-  		</li>
- 	<?php endforeach; ?>
- </ul>
-<?php
-
-$template = '
-
-	<ul class="tabs">
-		<!-- tab -->
-			<li>
-				<a class="#active#" href="#href#">#tab#</a>
-			</li>
-		<!-- /tab -->
-	</ul>
-	
-
-';
-
-$tabs = array("home.html"=>"homepage","news.html"=>"news","about.html"=>"about");
-$s = new Stamp($template);
-$current = "news";
-
-foreach($tabs as $lnk=>$t)
-	$menu .= $s->copy("tab")->put("href",$lnk)->put("tab",$t)->put("active",($current==$t)?"active":"inactive");
-
-echo $s->replace("tab",$menu);
-/**/
