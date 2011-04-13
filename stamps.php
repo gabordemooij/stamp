@@ -55,24 +55,27 @@ class Stamp {
 	 * );
 	 *
 	 * @param  string $id marker ID
+	 * @param  integer $next_pos starting position from which to search
 	 *
 	 * @return array $struct
 	 */
-	public function find( $id ) {
-		if (isset($this->fcache[$id])) {
-			return $this->fcache[$id];
+	public function find($id, $nextPos = 0) {
+        $cacheKey = $id.'|'.$nextPos;
+		if (isset($this->fcache[$cacheKey])) {
+			return $this->fcache[$cacheKey];
 		}
+        if($nextPos >= strlen($this->tpl)) return array();
 		$fid = "<!-- ".$id." -->";
 		$fidEnd = "<!-- /".$id." -->";
 		$len = strlen($fid);
-		$begin = strpos($this->tpl,$fid);
+		$begin = strpos($this->tpl, $fid, $nextPos);
 		$padBegin = $begin + $len;
-		$rest = substr($this->tpl,$padBegin);
-		$end = strpos($rest,$fidEnd);
+		$rest = substr($this->tpl, $padBegin);
+		$end = strpos($rest, $fidEnd);
 		$padEnd = $end + strlen($fidEnd);
-		$stamp = substr($rest,0,$end);
+		$stamp = substr($rest, 0, $end);
 		$keys = array( "begin"=>$begin, "padBegin"=>$padBegin, "end"=>$end, "padEnd"=>$padEnd, "copy"=>$stamp );
-		$this->fcache[$id] = $keys;
+		$this->fcache[$cacheKey] = $keys;
 		return $keys;
 	}
 
@@ -107,11 +110,16 @@ class Stamp {
 	 * @return Stamp stamp
 	 */
 	public function replace( $where, $paste ) {
-		$keys = $this->find($where);
-		$suffix = substr($this->tpl,$keys["padEnd"]+$keys["padBegin"]);
-		$prefix = substr($this->tpl,0,$keys["begin"]);
-		$copy = $prefix.$paste.$suffix;
-		$this->tpl = $copy;
+        $nextPos = 0;
+        while($nextPos < strlen($this->tpl)) {
+            $keys = $this->find($where, $nextPos);
+            if(!$keys['begin']) break;
+            $nextPos = $keys['begin'] + strlen($paste);
+            $suffix = substr($this->tpl,$keys["padEnd"]+$keys["padBegin"]);
+            $prefix = substr($this->tpl,0,$keys["begin"]);
+            $copy = $prefix.$paste.$suffix;
+            $this->tpl = $copy;
+        }
 		return $this; //new Stamp( $copy );
 	}
 
@@ -166,6 +174,7 @@ class Stamp {
 	 */
 	public function paste( $paste ) {
 		$this->tpl = $paste;
+        $this->fcache = array();
 		return $this;
 	}
 

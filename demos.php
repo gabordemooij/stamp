@@ -95,5 +95,30 @@ function demo2() {
     print "<hr><pre>".htmlspecialchars($tpl)."</pre>";
 };
 
-demo1();
-demo2();
+function test1() {
+    $content = '
+    <!-- title -->
+        My title
+    <!-- /title -->
+    <!-- title -->
+        My second title
+    <!-- /title -->
+    ';
+
+    $tpl = new Stamp($content);
+    $tpl->replace('title', 'my two titles');
+    return $tpl;
+
+}
+
+function run_tests() {
+    assert(trim(test1()) == "my two titles\n    my two titles");
+}
+
+if($_GET['run_tests']) {
+    run_tests();
+    print "<br>Tests: DONE";
+} else {
+    demo1();
+    demo2();
+}
