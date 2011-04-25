@@ -26,6 +26,12 @@ class Stamp {
 	 * @var array
 	 */
 	private $fcache = array();
+	
+	/**
+	* @var array
+	*
+	*/
+	public static $tcache = array();
 
 	/**
 	 * Constructor
@@ -36,7 +42,34 @@ class Stamp {
 	 */
 	public function __construct($templ) {
 		$this->tpl=$templ;
-
+	}
+	
+	
+	/**
+	* Loads a template and returns an instance configured
+	* with this template; supports caching.
+	*
+	* @param string $filename template file path
+	*
+	* @return Stamp $instance instance of Stamp class
+	*/
+	public static function load($filename) {
+		
+		$hash = md5($filename);
+		if (isset(self::$tcache[$hash])) return self::$tcache[$hash];
+		
+		if (!file_exists($filename)) {
+			throw new Exception("Could not find file $filename");
+		}
+		if (!is_readable($filename)) {
+			throw new Exception("File $filename is not readable");
+		}
+		
+		$str = file_get_contents($filename);
+		self::$tcache[ $hash ] = $str;
+		
+		return new self( $str );
+		
 	}
 
 	/**
