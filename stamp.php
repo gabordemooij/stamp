@@ -40,9 +40,11 @@ class Stamp {
 	 *
 	 * @return void
 	 */
-	public function __construct($templ,$id="") {
+	public function __construct($templ,$id="",$autofind=true) {
 		$this->tpl=$templ;
 		$this->id = $id;
+		if ($autofind)
+		$this->autoFindRegions();
 	}
 	
 	
@@ -197,7 +199,7 @@ class Stamp {
 	}
 
 	public function cut($id) {
-		$snippet = $this->copy('cut:'.$id);print_r($snippet); 
+		$snippet = $this->copy('cut:'.$id); 
 		$this->replace("cut:$id","");
 		return $snippet;	
 	}
@@ -290,23 +292,23 @@ class Stamp {
 
 
 	public function fetch($id) {
-		return $this->snippets[$id];
+		return new self( $this->snippets[$id], $this->snippets[$id]->id);
 	}
 
 
 
 	public function pasteIn($sid,$snippet) {
 		$id = $snippet->id;
-		print_r($this->restrictions[$sid]);
-		if (isset($this->restrictions[$sid])) {
-			if (isset($this->restrictions[$sid][$id])) {
-				$slotPos = strpos($this->tpl,"<!-- paste:".$sid);
-				$suffix = substr($this->tpl,0,$slotPos);
-				$prefix = substr($this->tpl,$slotPos);
-				$copy = $prefix.$snippet.$suffix;
-				$this->tpl = $copy;
-     			}
-		}
+		if ( (isset($this->restrictions[$sid]) &&
+			  isset($this->restrictions[$sid][$id])) ||
+			  (!isset($this->restrictions[$sid]))
+		) {
+			$slotPos = strpos($this->tpl,"<!-- paste:".$sid);
+			$prefix = substr($this->tpl,0,$slotPos);
+			$suffix = substr($this->tpl,$slotPos);
+			$copy = $prefix.$snippet.$suffix;
+			$this->tpl = $copy;
+    	}
 	}
 	
 
