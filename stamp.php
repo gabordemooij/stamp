@@ -40,8 +40,9 @@ class Stamp {
 	 *
 	 * @return void
 	 */
-	public function __construct($templ) {
+	public function __construct($templ,$id="") {
 		$this->tpl=$templ;
+		$this->id = $id;
 	}
 	
 	
@@ -110,6 +111,95 @@ class Stamp {
 		$keys = array( "begin"=>$begin, "padBegin"=>$padBegin, "end"=>$end, "padEnd"=>$padEnd, "copy"=>$stamp );
 		$this->fcache[$cacheKey] = $keys;
 		return $keys;
+	}
+	
+	protected $snippets = array();	
+	
+	public function autoFindRegions() {
+	
+		/*	$pointer = 0;
+		while($beginOfComment = strpos($this->tpl,'<!--',$pointer)) {
+			$endOfOpenComment = strpos($this->tpl,'-->',$beginOfComment);
+			$openComment = substr($this->tpl,$beginOfComment,($endOfOpenComment-$beginOfComment));
+			$openComment = substr($openComment,4); //strip the <!-- part
+			echo 'COMMENT='.$openComment;
+			//Does this comment contain a TYPE identifier? -- Look for :
+			if ($colon=strpos($openComment,':')) {
+				echo 'CONTAINS TYPE ID';
+				$commentParts = explode(':',$openComment);
+				if (count($commentParts)==2) {
+					$commentTypeID = trim($commentParts[0]);
+					$regionID = trim($commentParts[1]);
+					echo 'Comment Type = '.$commentTypeID;
+					echo 'Region = '.$regionID;
+					
+					switch($commentTypeID) {
+						
+						//if cut -- then cut the region content and store it in inventory
+						case "cut":
+						break;
+						
+						//if copy -- leave region content alone but copy contents
+						case "copy":
+						break;
+						
+						//if glue -- point to glue copied/cut parts
+						case "glue":
+						break;	
+							
+					}	
+					
+							
+				}		
+			}	 
+			exit;		
+		}
+		exit;
+		$begin = strpos($this->tpl,'<!-- cut:');
+		$begin += 	
+		$endOfOpenTag = strpos($this->tpl,' --!>',$begin);		
+		$regionID = substr($this->tpl,$begin,($endOfOpenTag-$begin));
+		echo $regionID;	exit;*/
+		$x=0;	
+		while($x<10 && (($pos = strpos($this->tpl,'<!-- cut:'))!==false)) {
+			$end = strpos($this->tpl,'-->',$pos);
+			$id = trim(substr($this->tpl,$pos+9,$end-($pos+9)));
+			$this->snippets[$id]=$this->cut($id);
+			$this->snippets[$id]->id = $id;
+			$x++;
+		}
+		
+		
+		$pos=0;
+		while((strpos($this->tpl,'<!-- paste:',$pos)!==false) && $x<10) {
+			$pos = strpos($this->tpl,'<!-- paste:',$pos);
+			$end = strpos($this->tpl,'-->',$pos);
+			$end2 = strpos($this->tpl,'(',$pos);
+			$sid = trim(substr($this->tpl,$pos+11,(min($end,$end2)-($pos+11))));
+			if ($pos!==false) {
+				//found slot
+				$end = strpos($this->tpl,'-->',$pos);
+				$slot = substr($this->tpl,$pos,$end-$pos);
+				if (($respos=strpos($slot,'('))!==false) {
+					//has slot restriction from designer
+					$restrictions = substr($slot,$respos+1,strpos($slot,')')-($respos+1));
+					$resIds = explode(',',$restrictions);
+					$resIdArray = array();
+					foreach($resIds as $k=>$v) $resIdArray[$v]=true; 
+					$this->restrictions[ $sid ] = $resIdArray;
+				}
+			}
+			$pos = $end;
+			$x++;
+		}	
+		
+			
+	}
+
+	public function cut($id) {
+		$snippet = $this->copy('cut:'.$id);print_r($snippet); 
+		$this->replace("cut:$id","");
+		return $snippet;	
 	}
 
 	/**
@@ -198,6 +288,28 @@ class Stamp {
 		return $this;
 	}
 
+
+	public function fetch($id) {
+		return $this->snippets[$id];
+	}
+
+
+
+	public function pasteIn($sid,$snippet) {
+		$id = $snippet->id;
+		print_r($this->restrictions[$sid]);
+		if (isset($this->restrictions[$sid])) {
+			if (isset($this->restrictions[$sid][$id])) {
+				$slotPos = strpos($this->tpl,"<!-- paste:".$sid);
+				$suffix = substr($this->tpl,0,$slotPos);
+				$prefix = substr($this->tpl,$slotPos);
+				$copy = $prefix.$snippet.$suffix;
+				$this->tpl = $copy;
+     			}
+		}
+	}
+	
+
 	/**
 	 * Pastes the contents of $paste in the template; replaces entire template.
 	 *
@@ -207,7 +319,7 @@ class Stamp {
 	 */
 	public function paste( $paste ) {
 		$this->tpl = $paste;
-        $this->fcache = array();
+        	$this->fcache = array();
 		return $this;
 	}
 
@@ -243,14 +355,35 @@ class Stamp {
 	 *
 	 * @return Stamp $chainable Chainable
 	 */
-    public function extendWith($childString) {
-        $child = new Stamp($childString);
-        $parent = $this;
-        foreach($child->getMarkersList() as $marker) {
-            $copyInChild = $child->copy($marker);
-            $parent->replace($marker, $copyInChild);
-        }
-        return $this;
-    }
+	public function extendWith($childString) {
+        	$child = new Stamp($childString);
+        	$parent = $this;
+        	foreach($child->getMarkersList() as $marker) {
+            		$copyInChild = $child->copy($marker);
+            		$parent->replace($marker, $copyInChild);
+        	}
+        	return $this;
+    	}
 
 }
+
+
+
+$template = "";
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

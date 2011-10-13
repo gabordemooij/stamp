@@ -3,6 +3,32 @@
 /** EXAMPLES **/
 require "stamps.php";
 
+
+$t = '
+
+
+	<ul>
+		<!-- cut:listitem -->
+		<li>
+			#title#		
+		</li>
+		<!-- /cut:listitem -->
+		<!-- paste:here(listitem,otheritem) -->
+					
+	</ul>
+	
+
+';
+
+$stamp = new Stamp($t);
+$stamp->autoFindRegions();
+$li = $stamp->fetch('listitem');
+$li->put('title','My Item');
+$stamp->pasteIn('here',$li);
+echo $stamp;
+
+
+exit;
 function demo1() {
     $current = "news";
     $tabs = array("home.html"=>"homepage","news.html"=>"news","about.html"=>"about");
