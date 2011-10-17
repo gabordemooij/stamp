@@ -47,6 +47,9 @@ class Stamp {
 		$this->autoFindRegions();
 	}
 	
+	protected $snippets = array();	
+	
+	
 	
 	/**
 	* Loads a template and returns an instance configured
@@ -115,65 +118,27 @@ class Stamp {
 		return $keys;
 	}
 	
-	protected $snippets = array();	
 	
+	/**
+	 * Automatically scans template and cuts out all regions prefixed
+	 * with "cut:"
+	 * 
+	 * @return void
+	 */
 	public function autoFindRegions() {
 	
-		/*	$pointer = 0;
-		while($beginOfComment = strpos($this->tpl,'<!--',$pointer)) {
-			$endOfOpenComment = strpos($this->tpl,'-->',$beginOfComment);
-			$openComment = substr($this->tpl,$beginOfComment,($endOfOpenComment-$beginOfComment));
-			$openComment = substr($openComment,4); //strip the <!-- part
-			echo 'COMMENT='.$openComment;
-			//Does this comment contain a TYPE identifier? -- Look for :
-			if ($colon=strpos($openComment,':')) {
-				echo 'CONTAINS TYPE ID';
-				$commentParts = explode(':',$openComment);
-				if (count($commentParts)==2) {
-					$commentTypeID = trim($commentParts[0]);
-					$regionID = trim($commentParts[1]);
-					echo 'Comment Type = '.$commentTypeID;
-					echo 'Region = '.$regionID;
-					
-					switch($commentTypeID) {
-						
-						//if cut -- then cut the region content and store it in inventory
-						case "cut":
-						break;
-						
-						//if copy -- leave region content alone but copy contents
-						case "copy":
-						break;
-						
-						//if glue -- point to glue copied/cut parts
-						case "glue":
-						break;	
-							
-					}	
-					
-							
-				}		
-			}	 
-			exit;		
-		}
-		exit;
-		$begin = strpos($this->tpl,'<!-- cut:');
-		$begin += 	
-		$endOfOpenTag = strpos($this->tpl,' --!>',$begin);		
-		$regionID = substr($this->tpl,$begin,($endOfOpenTag-$begin));
-		echo $regionID;	exit;*/
-		$x=0;	
-		while($x<10 && (($pos = strpos($this->tpl,'<!-- cut:'))!==false)) {
+		
+		while((($pos = strpos($this->tpl,'<!-- cut:'))!==false)) {
 			$end = strpos($this->tpl,'-->',$pos);
 			$id = trim(substr($this->tpl,$pos+9,$end-($pos+9)));
 			$this->snippets[$id]=$this->cut($id);
 			$this->snippets[$id]->id = $id;
-			$x++;
+			
 		}
 		
 		
 		$pos=0;
-		while((strpos($this->tpl,'<!-- paste:',$pos)!==false) && $x<10) {
+		while((strpos($this->tpl,'<!-- paste:',$pos)!==false)) {
 			$pos = strpos($this->tpl,'<!-- paste:',$pos);
 			$end = strpos($this->tpl,'-->',$pos);
 			$end2 = strpos($this->tpl,'(',$pos);
@@ -192,12 +157,19 @@ class Stamp {
 				}
 			}
 			$pos = $end;
-			$x++;
+			
 		}	
 		
 			
 	}
 
+	/**
+	 * Cuts a region from the template.
+	 * 
+	 * @param string $id ID of the region that has to be cut
+	 * 
+	 * @return Stamp $stamp instance of Stamp
+	 */
 	public function cut($id) {
 		$snippet = $this->copy('cut:'.$id); 
 		$this->replace("cut:$id","");
@@ -245,7 +217,7 @@ class Stamp {
             $copy = $prefix.$paste.$suffix;
             $this->tpl = $copy;
         }
-		return $this; //new Stamp( $copy );
+		return $this; 
 	}
 
 
@@ -291,12 +263,26 @@ class Stamp {
 	}
 
 
+	/**
+	 * Fetches a previously cut snippet by id.
+	 * 
+	 * @param string $id ID of the snippet you want to fetch.
+	 * 
+	 * @return Stamp $stamp instance of Stamp 
+	 */
 	public function fetch($id) {
 		return new self( $this->snippets[$id], $this->snippets[$id]->id);
 	}
 
 
-
+	/**
+	 * Pastes a snippet in a region.
+	 * 
+	 * @param string $sid 		Region ID
+	 * @param string $snippet 	HTML Snippet to drop in the region
+	 * 
+	 * @return void
+	 */
 	public function pasteIn($sid,$snippet) {
 		$id = $snippet->id;
 		if ( (isset($this->restrictions[$sid]) &&
@@ -365,13 +351,21 @@ class Stamp {
             		$parent->replace($marker, $copyInChild);
         	}
         	return $this;
-    	}
+    }
+    
+    /**
+     * Removes all comments and redundant whitespaces from template.
+     * 
+     * @return Stamp $self
+     */
+    public function wash() {
+    	$this->tpl = preg_replace("/<!--\s*[a-zA-Z0-9:\(\),\/]*\s*-->/m","",$this->tpl);
+    	$this->tpl = preg_replace("/\n[\n\t\s]*\n/m","\n",$this->tpl);
+    	$this->tpl = trim($this->tpl);
+    	return $this;	
+    }
 
 }
-
-
-
-$template = "";
 
 
 
