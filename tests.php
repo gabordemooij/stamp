@@ -1,6 +1,6 @@
 <?php
 
-require('stamp.php');
+require('Stamp.php');
 
 function printtext($text) {
 	echo $text;

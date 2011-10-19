@@ -129,6 +129,7 @@ class Stamp {
 	
 		
 		while((($pos = strpos($this->tpl,'<!-- cut:'))!==false)) {
+			
 			$end = strpos($this->tpl,'-->',$pos);
 			$id = trim(substr($this->tpl,$pos+9,$end-($pos+9)));
 			$this->snippets[$id]=$this->cut($id);
@@ -271,7 +272,9 @@ class Stamp {
 	 * @return Stamp $stamp instance of Stamp 
 	 */
 	public function fetch($id) {
-		return new self( $this->snippets[$id], $this->snippets[$id]->id);
+		$new = new self( $this->snippets[$id], $this->snippets[$id]->id);
+		$new->snippets = $this->snippets[$id]->snippets;
+		return $new;
 	}
 
 

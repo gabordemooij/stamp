@@ -1,7 +1,7 @@
 <?php
 
 
-require('stamp.php');
+require('../Stamp.php');
 
 $template = '
 	<div id="appwindow">

@@ -1,6 +1,6 @@
 <?php
 
-require "stamp.php";
+require "../Stamp.php";
 
 $current = "news";
 $tabs = array("home.html"=>"homepage","news.html"=>"news","about.html"=>"about");
