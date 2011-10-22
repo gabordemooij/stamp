@@ -63,10 +63,9 @@ class Stamp_Painters_Table {
 	 * 
 	 * Slots:
 	 * 
-	 * in option snippet:
 	 * 
 	 * headrow head		A slot for a column name
-	 * row cell			A slot for a single cell value
+	 * row cell cell	A slot for a single cell value
 	 * 
 	 * @param Stamp $stamp Stamp instance that contains template (optional)
 	 */
