@@ -637,6 +637,60 @@ catch(Exception $e){
 }
 
 
+testpack('Infinte loop');
+try{
+	$template = '<!-- cut:hello -->hello there';
+	$stamp = new Stamp($template);
+}
+catch(Exception $e) {
+	pass();
+}
+
+testpack('Wrong regions');
+try{
+	$stamp = new Stamp('<!-- cut:hello ');
+}
+catch(Exception $e){
+	pass();
+}
+
+$stamp = new Stamp('data<!-- and logic');
+pass();
+$stamp = new Stamp('end --!> without a beginning.');
+pass();
+$stamp = new Stamp('--!>');
+pass();
+$stamp = new Stamp('<!--');
+pass();
+$stamp = new Stamp('<!-- logic -->');
+pass();
+$stamp = new Stamp('<!-- /logic -->');
+pass();
+$stamp = new Stamp('a<!-- chest -->treasure<!-- /chest -->b');
+asrt(strval($stamp->cut('chest')),'');
+pass();
+$stamp = new Stamp('a<!-- cut:chest -->treasure<!-- /cut:chest -->b');
+asrt(strval($stamp->cut('chest')),'treasure');
+pass();
+try{
+	$stamp = new Stamp('a<!-- cut:chest -->treasure<!-- /cat:chest -->b');
+	fail();
+}
+catch(Exception $e){
+	pass();
+}
+try{
+	$stamp = new Stamp('a<!-- cut:chest -->treasure<!-- /cat:chest -->b');
+	fail();
+}
+catch(Exception $e){
+	pass();
+}
+$stamp = new Stamp('a<!-- /cut:chest -->treasure<!-- /cat:chest -->b');
+pass();
+
+
+
 
 
 

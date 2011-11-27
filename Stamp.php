@@ -111,6 +111,7 @@ class Stamp {
 		$padBegin = $begin + $len;
 		$rest = substr($this->tpl, $padBegin);
 		$end = strpos($rest, $fidEnd);
+		//if ($end===false) throw new Exception('cannot find end marker for '.$id);
 		$padEnd = $end + strlen($fidEnd);
 		$stamp = substr($rest, 0, $end);
 		$keys = array( "begin"=>$begin, "padBegin"=>$padBegin, "end"=>$end, "padEnd"=>$padEnd, "copy"=>$stamp );
@@ -126,18 +127,15 @@ class Stamp {
 	 * @return void
 	 */
 	public function autoFindRegions() {
-	
-		
 		while((($pos = strpos($this->tpl,'<!-- cut:'))!==false)) {
-			
 			$end = strpos($this->tpl,'-->',$pos);
 			$id = trim(substr($this->tpl,$pos+9,$end-($pos+9)));
-			$this->snippets[$id]=$this->cut($id);
+			if ($end===false) throw new Exception('Cannot find end of marker for: '.$id);
+			$cut = $this->cut($id);
+			$this->snippets[$id]=$cut;
+			if (strval($cut)=='') throw new Exception('Unable to cut region: '.$id);
 			$this->snippets[$id]->id = $id;
-			
 		}
-		
-		
 		$pos=0;
 		while((strpos($this->tpl,'<!-- paste:',$pos)!==false)) {
 			$pos = strpos($this->tpl,'<!-- paste:',$pos);
@@ -158,10 +156,7 @@ class Stamp {
 				}
 			}
 			$pos = $end;
-			
 		}	
-		
-			
 	}
 
 	/**
@@ -211,7 +206,9 @@ class Stamp {
         $nextPos = 0;
         while($nextPos < strlen($this->tpl)) {
             $keys = $this->find($where, $nextPos);
-            if(!$keys['begin']) break;
+            if(!$keys['begin']) {
+            	break;
+            }
             $nextPos = $keys['begin'] + strlen($paste);
             $suffix = substr($this->tpl,$keys["padEnd"]+$keys["padBegin"]);
             $prefix = substr($this->tpl,0,$keys["begin"]);

@@ -1,7 +1,7 @@
 <?php
 
-
-require('../Stamp.php');
+set_include_path ('/var/www/html/lab/stamp');
+require('Stamp.php');
 
 $template = '
 	<div id="appwindow">
