@@ -64,7 +64,11 @@ class StampEngine {
 	
 	
 	public function __toString() {
-		return $this->template;
+		$template = $this->template;
+		$template = preg_replace("/<!--\s*[a-zA-Z0-9:\(\),\/]*\s*-->/m","",$template);
+    	$template = preg_replace("/\n[\n\t\s]*\n/m","\n",$template);
+    	$template = trim($template);
+		return $template;
 	}
 	
 	public function glue($what,$snippet) {
@@ -87,7 +91,15 @@ class StampEngine {
 	}
 	
 	public function inject($where,$data) {
+		$where = "#$where#";
 		$this->template = str_replace($where,$data,$this->template);
+		return $this;
+	}
+	
+	public function injectAll($array) {
+		foreach($array as $key=>$value) {
+			$this->inject($key, $value);
+		}
 		return $this;
 	}
 	
@@ -127,6 +139,32 @@ $cell = $se->get('table.row.cell');
 */
 
 
+$template = '
+	<!-- cut:form -->
+	<form action="#action#" method="#method#">
+		<!-- paste:formElements -->
+		<!-- cut:textfield -->
+			<label>#label#</label>
+			<input type="text" name="#name#" value="#value#" />
+		<!-- /cut:textfield -->
+		<input type="submit" name="#send#" />
+	</form>
+	<!-- /cut:form -->
+';
+
+
+$se = new StampEngine($template);
+list($form,$textfield) = $se->collect('form|form.textfield');
+
+$form->glue('formElements',
+	$textfield->copy()->injectAll(array(
+			'label'=>'Your name',
+			'name'=>'username',
+			'value'=>'...your name please...'))
+	)->inject('send','Update your Profile');
+
+echo $form;
+exit;
 
 $template =  "
 	
@@ -170,11 +208,11 @@ $data = array(array('Pepperoni','7.99'),array('Veggie','6.99'));
 
 //$se = new StampEngine($template);
 list($table,$columnHead,$row,$cell) = $se->collect('table|table.column|table.row|table.row.cell');
-foreach($columns as $column) $table->glue('columns',$columnHead->copy()->inject('#column#',$column));
+foreach($columns as $column) $table->glue('columns',$columnHead->copy()->inject('column',$column));
 foreach($data as $pizzaInfoLine) {
 	$pizzaRow = $row->copy();
 	foreach($pizzaInfoLine as $pizzaInfo) {
-		$pizzaRow->glue('cells',$cell->copy()->inject('#cell#',$pizzaInfo));
+		$pizzaRow->glue('cells',$cell->copy()->inject('cell',$pizzaInfo));
 	}
 	$table->glue('rows',$pizzaRow);
 }
