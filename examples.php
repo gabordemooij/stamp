@@ -3,6 +3,24 @@
 require('StampEngine.php');
 
 $template = '
+<div>
+	<!-- cut:diamond -->
+		<img src="diamond.gif" />
+	<!-- /cut:diamond -->
+</div>	
+<div id="box">
+		<!-- paste:jewellery -->
+	</div>	
+';
+
+$se = new StampEngine($template);
+$diamond = $se->get('diamond');
+echo $diamond;
+$diamond = $se->get('diamond');
+$se->glue('jewellery',$diamond);
+echo $se;
+
+$template = '
 	<!-- cut:form -->
 	<form action="#action#" method="#method#">
 		<!-- paste:formElements -->
