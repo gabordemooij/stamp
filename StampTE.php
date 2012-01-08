@@ -20,7 +20,7 @@
  *  @license New BSD License
  *  ---------------------------------------------------------------------------
  */
-class StampEngine {
+class StampTE {
 
 	/**
 	 * Holds the template

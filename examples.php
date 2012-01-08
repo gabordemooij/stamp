@@ -1,6 +1,6 @@
 <?php
 
-require('StampEngine.php');
+require('StampTE.php');
 
 $template = '
 <div>
@@ -13,7 +13,7 @@ $template = '
 	</div>	
 ';
 
-$se = new StampEngine($template);
+$se = new StampTE($template);
 $diamond = $se->get('diamond');
 echo $diamond;
 $diamond = $se->get('diamond');
@@ -34,7 +34,7 @@ $template = '
 ';
 
 
-$se = new StampEngine($template);
+$se = new StampTE($template);
 list($form,$textfield) = $se->collect('form|form.textfield');
 
 $form->glue('formElements',
@@ -83,7 +83,7 @@ $data = array(array('Pepperoni','7.99'),array('Veggie','6.99'));
 
 
 
-$se = new StampEngine($template);
+$se = new StampTE($template);
 list($table,$columnHead,$row,$cell) = $se->collect('table|table.column|table.row|table.row.cell');
 foreach($columns as $column) $table->glue('columns',$columnHead->copy()->inject('column',$column));
 foreach($data as $pizzaInfoLine) {
