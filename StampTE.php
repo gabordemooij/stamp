@@ -180,12 +180,14 @@ class StampTE {
 	/**
 	 * Injects a piece of data into the slot marker in the snippet/template.
 	 * 
-	 * @param string $where ID of the slot where to inject the data
-	 * @param string $data  the data to inject in the slot
+	 * @param string  $where ID of the slot where to inject the data
+	 * @param string  $data  the data to inject in the slot
+	 * @param boolean $raw   if TRUE output will not be escaped
 	 * 
 	 * @return StampEngine $snippet self, chainable 
 	 */
-	public function inject($where,$data) {
+	public function inject($where,$data, $raw=false) {
+		if (!$raw) $where = htmlspecialchars($where);
 		$where = "#$where#";
 		$this->template = str_replace($where,$data,$this->template);
 		return $this;
@@ -195,12 +197,13 @@ class StampTE {
 	 * Same as inject() but injects an entire array of slot->data pairs.
 	 * 
 	 * @param array $array Array of slot->data pairs
+	 * @param boolean $raw   if TRUE output will not be escaped
 	 * 
-	 * @return StampEngine self, chainable 
+	 * @return StampEngine self, chainable
 	 */
-	public function injectAll($array) {
+	public function injectAll($array,$raw=false) {
 		foreach($array as $key=>$value) {
-			$this->inject($key, $value);
+			$this->inject($key, $value, $raw);
 		}
 		return $this;
 	}
