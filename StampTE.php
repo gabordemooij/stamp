@@ -187,7 +187,7 @@ class StampTE {
 	 * @return StampEngine $snippet self, chainable 
 	 */
 	public function inject($where,$data, $raw=false) {
-		if (!$raw) $where = htmlspecialchars($where);
+		if (!$raw) $data = htmlspecialchars($data);
 		$where = "#$where#";
 		$this->template = str_replace($where,$data,$this->template);
 		return $this;
