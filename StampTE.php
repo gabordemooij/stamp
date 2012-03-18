@@ -186,8 +186,8 @@ class StampTE {
 	 * 
 	 * @return StampEngine $snippet self, chainable 
 	 */
-	public function inject($where,$data, $raw=false) {
-		if (!$raw) $data = htmlspecialchars($data);
+	public function inject($where, $data, $raw=false) {
+		if (!$raw) $data = $this->filter($data);
 		$where = "#$where#";
 		$this->template = str_replace($where,$data,$this->template);
 		return $this;
@@ -252,6 +252,17 @@ class StampTE {
 	public function loadIntoCache($rawCacheData) {
 		$this->cache = unserialize($rawCacheData);
 	}	
+	
+	/**
+	 * Filters data.
+	 * 
+	 * @param string $string
+	 * 
+	 * @return string $string 
+	 */
+	protected function filter($data) {
+		return htmlspecialchars($data,ENT_COMPAT,'UTF-8');
+	}
 	
 	
 }
