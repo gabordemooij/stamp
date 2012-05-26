@@ -288,5 +288,4 @@ class StampTE {
 		return htmlspecialchars($data,ENT_COMPAT,'UTF-8');
 	}
 	
-	
 }

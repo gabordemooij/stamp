@@ -564,3 +564,25 @@ asrt(strval($stamp->get('chest')),'treasure');
 pass();
 $stamp = new StampTE('a<!-- cut:chest -->treasure<!-- /cat:chest -->b');
 asrt(strval($stamp),'atreasureb');
+
+
+testpack('Test Filters');
+$template = '<b>#test#</b>';
+
+class InternationalStampTE extends StampTE {
+
+	
+	protected function filter($data) {
+		$data = DICT($data);
+		$data = parent::filter($data);
+		return $data;
+	}
+	
+}
+function DICT($text) {
+	if ($text=='hello') return 'Allo';
+}
+
+$stamp = new InternationalStampTE($template);
+$stamp->inject('test','hello');
+asrt(strval($stamp),'<b>Allo</b>');
