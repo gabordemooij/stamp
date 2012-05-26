@@ -178,6 +178,30 @@ class StampTE {
 	}
 
 	/**
+	 * Glues all elements in the specified array.
+	 * This is a quick way to glue multiple elements as well.
+	 * 
+	 * @param array $map list of key=>value pairs to glue
+	 * 
+	 * @return StampEngine $snippet self, chainable  
+	 */
+	public function glueAll($map) {
+		foreach($map as $slot=>$value) {
+			if (is_array($value)) {
+				foreach($value as $item) {
+					$this->glue($slot,$item);
+				}
+			}
+			else {
+				$this->glue($slot,$value);
+			}
+		}
+		return $this;
+	}
+	
+	
+	
+	/**
 	 * Injects a piece of data into the slot marker in the snippet/template.
 	 * 
 	 * @param string  $where ID of the slot where to inject the data
