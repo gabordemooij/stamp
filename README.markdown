@@ -29,25 +29,25 @@ A cut point maker marks a region in the
 template that will be cut out from the template 
 and stored under the specified ID. 
 
- <div>
+    <div>
     <!-- cut:diamond -->
-        <img src="diamond.gif" />
+    <img src="diamond.gif" />
     <!-- /cut:diamond -->
- </div>
+    </div>
 
 
 Now pass the template to StampTE:
 
-$se = new StampTE($templateHTML);
+    $se = new StampTE($templateHTML);
 
 To obtain the diamond image:
 
-echo $se->get('diamond');
+    echo $se->get('diamond');
 
 Result:
 
 
-<img src="diamond.gif" />
+    <img src="diamond.gif" />
 
 
 
