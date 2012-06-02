@@ -218,6 +218,19 @@ class StampTE {
 	}
 	
 	/**
+	 * Alias for inject($where,$data,TRUE)
+	 * 
+	 * @param string  $where ID of the slot where to inject the data
+	 * @param string  $data  the data to inject in the slot
+	 *
+	 * @return StampEngine $snippet self, chainable 
+	 */
+	public function injectRaw($where,$data) {
+		return $this->inject($where, $data, true);
+	}
+	
+	
+	/**
 	 * Same as inject() but injects an entire array of slot->data pairs.
 	 * 
 	 * @param array $array Array of slot->data pairs
