@@ -170,7 +170,7 @@ class StampTE {
 			$allowedSnippets = $matches[2];
 			$allowedMap = array_flip(explode(',',$allowedSnippets));
 			if (!isset($allowedMap[$snippet->getID()])) {
-				throw new Exception('Snippet '.$snippet->getID().' not allowed in slot '.$what);
+				throw new StampTEException('Snippet '.$snippet->getID().' not allowed in slot '.$what);
 			}
 		}
 		$this->template = preg_replace($pattern,$snippet.$copyOrig,$this->template);
@@ -289,3 +289,7 @@ class StampTE {
 	}
 	
 }
+
+
+//Stamp Exception
+class StampTEException extends Exception {}
