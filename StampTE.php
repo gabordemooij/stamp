@@ -71,6 +71,20 @@ class StampTE {
 		
 	}
 	
+	
+	/**
+	 * Creates an instance of StampTE template using a file.
+	 * 
+	 * @param string $filename file containing HTML input
+	 * @return self 
+	 */
+	public static function load($filename) {
+		if (!file_exists($filename)) throw new StampTEException('Could not find file: '.$filename);
+		$template = file_get_contents($filename);
+		return new self($template);
+	}
+	
+	
 	/**
 	 * Checks whether a snippet with ID $id is in the catelogue.
 	 * 
@@ -305,4 +319,4 @@ class StampTE {
 
 
 //Stamp Exception
-class StampTEException extends Exception {}
+class StampTEException extends InvalidArgumentException {}
