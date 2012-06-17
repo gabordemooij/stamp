@@ -28,7 +28,7 @@ function pass() {
 function fail() {
 	printtext("FAILED TEST");
 	debug_print_backtrace();
-	exit;
+	exit(1);
 }
 
 function clean($s) {
@@ -586,3 +586,7 @@ function DICT($text) {
 $stamp = new InternationalStampTE($template);
 $stamp->inject('test','hello');
 asrt(strval($stamp),'<b>Allo</b>');
+
+
+
+exit(0);
