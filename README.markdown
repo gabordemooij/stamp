@@ -3,6 +3,7 @@
 STAMP
 =====
 
+[![Build Status](https://secure.travis-ci.org/gabordemooij/stamp.png)](http://travis-ci.org/gabordemooij/stamp)
 
 Stamp is micro template library orignally written by Gabor de Mooij.
 
