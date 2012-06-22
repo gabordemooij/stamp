@@ -63,23 +63,23 @@ if (class_exists('StampTE')) pass();
 $stamp = new StampTE('');
 
 //Test the wash() function
-$template = "HELL<!-- erase:me -->OWORLD";
+$template = "HELL<!-- paste:me -->OWORLD";
 $stamp = new StampTE($template);
 asrt("HELLOWORLD",trim($stamp));
 
 
-$template = "HELL<!-- erase:me(and,me) -->OWORLD";
+$template = "HELL<!-- paste:me(and,me) -->OWORLD";
 $stamp = new StampTE($template);
 asrt("HELLOWORLD",trim($stamp));
 
-$template = "HELL<!-- eraseme -->OWORLD";
+$template = "HELL<!-- paste:test -->OWORLD";
 $stamp = new StampTE($template);
 asrt("HELLOWORLD",trim($stamp));
 
 
-$template = "HELL<!-- eraseme -->OW<!-- and:me(yeah) -->ORLD";
+$template = "HELL<!-- cut:wow -->OW<!-- /cut:wow -->ORLD";
 $stamp = new StampTE($template);
-asrt("HELLOWORLD",trim($stamp));
+asrt("HELLORLD",trim($stamp));
 
 
 $template = "HELLO
@@ -538,7 +538,7 @@ asrt(clean($stamp),clean($expectation));
 testpack('Infinte loop - no longer an issue, preserving tests.');
 $template = '<!-- cut:hello -->hello there';
 $stamp = new StampTE($template);
-asrt(strval($stamp),'hello there');
+asrt(strval($stamp),'<!-- cut:hello -->hello there');
 	
 $stamp = new StampTE('<!-- cut:hello ');
 asrt(strval($stamp),'<!-- cut:hello');
@@ -563,7 +563,7 @@ $stamp = new StampTE('a<!-- cut:chest -->treasure<!-- /cut:chest -->b');
 asrt(strval($stamp->get('chest')),'treasure');
 pass();
 $stamp = new StampTE('a<!-- cut:chest -->treasure<!-- /cat:chest -->b');
-asrt(strval($stamp),'atreasureb');
+asrt(strval($stamp) ,'a<!-- cut:chest -->treasure<!-- /cat:chest -->b');
 
 
 testpack('Test Filters');
@@ -587,6 +587,14 @@ $stamp = new InternationalStampTE($template);
 $stamp->inject('test','hello');
 asrt(strval($stamp),'<b>Allo</b>');
 
+testpack('Test Cleaning');
 
+$stamp = new StampTE('Test <!-- paste:test --> test <!-- cut:piece -->piece<!-- /cut:piece -->');
+$str = strval($stamp);
+asrt(strpos('<!--',$str),false);
+$p = $stamp->get('piece');
+$stamp->glue('test',$p);
+$str = strval($stamp);
+asrt(strpos('<!--',$str),false);
 
 exit(0);
