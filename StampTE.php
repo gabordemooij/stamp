@@ -39,7 +39,7 @@ class StampTE {
 	 * keyed by IDs.
 	 * @var array
 	 */
-	private $catelogue;
+	private $catalogue;
 	
 	/**
 	 * Identifier of current template snippet.
@@ -66,7 +66,7 @@ class StampTE {
 		$pattern = '/<!\-\-\scut:(\w+)\s\-\->(.*)?<!\-\-\s\/cut:\1\s\-\->/sU';
 		preg_match_all($pattern, $this->template, $this->matches);
 		$this->template = preg_replace($pattern,'',$this->template);
-		$this->catelogue = array_flip($this->matches[1]);
+		$this->catalogue = array_flip($this->matches[1]);
 		$this->sketchBook = $this->matches[2];
 		
 	}
@@ -86,14 +86,14 @@ class StampTE {
 	
 	
 	/**
-	 * Checks whether a snippet with ID $id is in the catelogue.
+	 * Checks whether a snippet with ID $id is in the catalogue.
 	 * 
 	 * @param string $id identifier you are looking for
 	 * 
 	 * @return boolean $yesNo whether the snippet with this ID is available or not. 
 	 */
-	public function inCatelogue($id) {
-		return (boolean) (isset($this->catelogue[$id]));
+	public function inCatalogue($id) {
+		return (boolean) (isset($this->catalogue[$id]));
 	}
 	
 	/**
@@ -111,8 +111,8 @@ class StampTE {
 			array_shift($parts);
 			$rest = implode('.',$parts);
 		}
-		if ($this->inCatelogue($id)) {
-			$snippet = $this->sketchBook[$this->catelogue[$id]];
+		if ($this->inCatalogue($id)) {
+			$snippet = $this->sketchBook[$this->catalogue[$id]];
 			$new = new self($snippet,$id);
 		}
 		if (isset($parts)) { 
