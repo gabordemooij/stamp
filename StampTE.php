@@ -81,7 +81,7 @@ class StampTE {
 	public static function load($filename) {
 		if (!file_exists($filename)) throw new StampTEException('Could not find file: '.$filename);
 		$template = file_get_contents($filename);
-		return new self($template);
+		return new static($template);
 	}
 	
 	
@@ -113,7 +113,7 @@ class StampTE {
 		}
 		if ($this->inCatalogue($id)) {
 			$snippet = $this->sketchBook[$this->catalogue[$id]];
-			$new = new self($snippet,$id);
+			$new = new static($snippet,$id);
 		}
 		if (isset($parts)) { 
 			return $new->get($rest);
