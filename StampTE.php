@@ -1,16 +1,16 @@
 <?php
 /**
- * 
- *           _                                                                
- *         /' `\     /'                                         /'            
- *       /'   ._)--/'--                                     --/'--            
- *      (____    /' ____     ,__________      ____          /'          ____  
- *           ) /' /'    )   /'    )     )   /'    )--     /'          /'    ) 
- *         /'/' /'    /'  /'    /'    /'  /'    /'      /'          /(___,/'  
+ *
+ *           _
+ *         /' `\     /'                                         /'
+ *       /'   ._)--/'--                                     --/'--
+ *      (____    /' ____     ,__________      ____          /'          ____
+ *           ) /' /'    )   /'    )     )   /'    )--     /'          /'    )
+ *         /'/' /'    /'  /'    /'    /'  /'    /'      /'          /(___,/'
  *(_____,/' (__(___,/(__/'    /'    /(__/(___,/'       (__        O(________ O
- *                                    /'                                      
- *                                  /'                                        
- *                                /'                                          
+ *                                    /'
+ *                                  /'
+ *                                /'
  *
  *  ---------------------------------------------------------------------------
  *  Stamp t.e.
@@ -26,38 +26,51 @@ class StampTE {
 	 * Holds the template
 	 * @var string
 	 */
-	private $template; 
-	
+	private $template;
+
 	/**
 	 * Collection of initial matches from template
 	 * @var array
 	 */
 	private $matches;
-	
+
 	/**
 	 * Processed array of HTML parts found in template,
 	 * keyed by IDs.
 	 * @var array
 	 */
 	private $catalogue;
-	
+
 	/**
 	 * Identifier of current template snippet.
-	 * @var string 
+	 * @var string
 	 */
 	private $id;
-	
+
 	/**
 	 * Cache array.
-	 * @var array 
+	 * @var array
 	 */
 	private $cache = array();
 
 	/**
+	 * Output Filter Behavior
+	 * @var StampFilterBehavior
+	 */
+	protected $filterBehavior;
+
+	/**
+	 * Default behavior for $filterBehavior
+	 *
+	 * @var StampFilterBehavior
+	 */
+	protected static $defaultFilterBehavior;
+
+	/**
 	 * Constructor. Pass nothing if you plan to use cache.
-	 * 
+	 *
 	 * @param string $tpl HTML Template
-	 * @param string $id  identification string for this template 
+	 * @param string $id  identification string for this template
 	 */
 	public function __construct($tpl='',$id='root') {
 		$this->id = $id;
@@ -68,41 +81,52 @@ class StampTE {
 		$this->template = preg_replace($pattern,'',$this->template);
 		$this->catalogue = array_flip($this->matches[1]);
 		$this->sketchBook = $this->matches[2];
-		
+		if (self::$defaultFilterBehavior) {
+			$this->filterBehavior = clone self::$defaultFilterBehavior;
+		}
 	}
-	
-	
+
+	public function setFilterBehavior(StampFilterBehavior $behavior)
+	{
+		$this->filterBehavior = $behavior;
+	}
+
+	public static function setDefaultFilterBehavior(StampFilterBehavior $behavior)
+	{
+		self::$defaultFilterBehavior = $behavior;
+	}
+
 	/**
 	 * Creates an instance of StampTE template using a file.
-	 * 
+	 *
 	 * @param string $filename file containing HTML input
-	 * @return self 
+	 * @return self
 	 */
 	public static function load($filename) {
 		if (!file_exists($filename)) throw new StampTEException('Could not find file: '.$filename);
 		$template = file_get_contents($filename);
 		return new self($template);
 	}
-	
-	
+
+
 	/**
 	 * Checks whether a snippet with ID $id is in the catalogue.
-	 * 
+	 *
 	 * @param string $id identifier you are looking for
-	 * 
-	 * @return boolean $yesNo whether the snippet with this ID is available or not. 
+	 *
+	 * @return boolean $yesNo whether the snippet with this ID is available or not.
 	 */
 	public function inCatalogue($id) {
 		return (boolean) (isset($this->catalogue[$id]));
 	}
-	
+
 	/**
 	 * Returns a new instance of StampEngine configured with the template
 	 * that corresponds to the specified ID.
-	 * 
+	 *
 	 * @param string $id identifier
-	 * 
-	 * @return StampEngine $snippet 
+	 *
+	 * @return StampEngine $snippet
 	 */
 	public function get($id) {
 		if (strpos($id,'.')!==false) {
@@ -115,23 +139,23 @@ class StampTE {
 			$snippet = $this->sketchBook[$this->catalogue[$id]];
 			$new = new self($snippet,$id);
 		}
-		if (isset($parts)) { 
+		if (isset($parts)) {
 			return $new->get($rest);
 		}
 		else {
 			return $new;
 		}
 	}
-	
+
 	/**
 	 * Collects snippets from the template.
 	 * $list needs to be a | pipe separated list of snippet IDs. The snippets
 	 * will be returned as an array so you can obtain them using the list()
 	 * statement.
-	 * 
+	 *
 	 * @param string $list List of IDs you want to fetch from template
-	 * 
-	 * @return array $snippets Snippets obtained from template 
+	 *
+	 * @return array $snippets Snippets obtained from template
 	 */
 	public function collect($list) {
 		if (isset($this->cache[$list])) return $this->cache[$list];
@@ -142,13 +166,13 @@ class StampTE {
 		}
 		return $collection;
 	}
-	
+
 	/**
 	 * Returns a snippet/template as a string. Besides converting the instance
 	 * to a string this function removes all HTML comments and unnecessary space.
 	 * If you don't want this use a different toString method like ->getString()
 	 *
-	 * @return string $string string representation of HTML snippet/template 
+	 * @return string $string string representation of HTML snippet/template
 	 */
 	public function __toString() {
 		$template = $this->template;
@@ -157,22 +181,22 @@ class StampTE {
     	$template = trim($template);
 		return $template;
 	}
-	
+
 	/**
 	 * Returns the template as a string.
-	 * 
-	 * @return string $raw raw template 
+	 *
+	 * @return string $raw raw template
 	 */
 	public function getString() {
 		return $this->template;
 	}
-	
+
 	/**
 	 * Glues a snippet to a glue point in the current snippet/template.
-	 * 
+	 *
 	 * @param string      $what    ID of the Glue Point you want to append the contents of the snippet to.
 	 * @param StampEngine $snippet a StampEngine snippet/template to be glued at this point
-	 * 
+	 *
 	 * @return StampEngine $snippet self, chainable
 	 */
 	public function glue($what,$snippet) {
@@ -194,10 +218,10 @@ class StampTE {
 	/**
 	 * Glues all elements in the specified array.
 	 * This is a quick way to glue multiple elements as well.
-	 * 
+	 *
 	 * @param array $map list of key=>value pairs to glue
-	 * 
-	 * @return StampEngine $snippet self, chainable  
+	 *
+	 * @return StampEngine $snippet self, chainable
 	 */
 	public function glueAll($map) {
 		foreach($map as $slot=>$value) {
@@ -212,17 +236,17 @@ class StampTE {
 		}
 		return $this;
 	}
-	
-	
-	
+
+
+
 	/**
 	 * Injects a piece of data into the slot marker in the snippet/template.
-	 * 
+	 *
 	 * @param string  $where ID of the slot where to inject the data
 	 * @param string  $data  the data to inject in the slot
 	 * @param boolean $raw   if TRUE output will not be escaped
-	 * 
-	 * @return StampEngine $snippet self, chainable 
+	 *
+	 * @return StampEngine $snippet self, chainable
 	 */
 	public function inject($where, $data, $raw=false) {
 		if (!$raw) $data = $this->filter($data);
@@ -230,26 +254,26 @@ class StampTE {
 		$this->template = str_replace($where,$data,$this->template);
 		return $this;
 	}
-	
+
 	/**
 	 * Alias for inject($where,$data,TRUE)
-	 * 
+	 *
 	 * @param string  $where ID of the slot where to inject the data
 	 * @param string  $data  the data to inject in the slot
 	 *
-	 * @return StampEngine $snippet self, chainable 
+	 * @return StampEngine $snippet self, chainable
 	 */
 	public function injectRaw($where,$data) {
 		return $this->inject($where, $data, true);
 	}
-	
-	
+
+
 	/**
 	 * Same as inject() but injects an entire array of slot->data pairs.
-	 * 
+	 *
 	 * @param array $array Array of slot->data pairs
 	 * @param boolean $raw   if TRUE output will not be escaped
-	 * 
+	 *
 	 * @return StampEngine self, chainable
 	 */
 	public function injectAll($array,$raw=false) {
@@ -258,65 +282,79 @@ class StampTE {
 		}
 		return $this;
 	}
-	
+
 	/**
 	 * Returns the identifier of the current snippet/template.
-	 * 
-	 * @return string $id ID of this snippet/template 
+	 *
+	 * @return string $id ID of this snippet/template
 	 */
 	public function getID() {
 		return $this->id;
 	}
-	
+
 	/**
 	 * Copies the current snippet/template.
-	 * 
-	 * @return StampEngine $copy Copy of the current template/snippet 
+	 *
+	 * @return StampEngine $copy Copy of the current template/snippet
 	 */
 	public function copy() {
 		return clone($this);
 	}
-	
+
 	/**
 	 * Collects a list, just like collect() but stores result in cache array.
-	 * 
-	 * @param string $list Pipe separated list of IDs. 
+	 *
+	 * @param string $list Pipe separated list of IDs.
 	 */
 	public function writeToCache($list) {
 		$this->cache[$list] = $this->collect($list);
 	}
-	
+
 	/**
 	 * Returns the cache object for storage to disk.
-	 * 
-	 * @return string $cache serialized cache object. 
+	 *
+	 * @return string $cache serialized cache object.
 	 */
 	public function getCache() {
 		return serialize($this->cache);
 	}
-	
+
 	/**
 	 * Loads cache data.
-	 * 
-	 * @param string $rawCacheData the serialized cached string as retrieved from getCache(). 
+	 *
+	 * @param string $rawCacheData the serialized cached string as retrieved from getCache().
 	 */
 	public function loadIntoCache($rawCacheData) {
 		$this->cache = unserialize($rawCacheData);
-	}	
-	
+	}
+
 	/**
 	 * Filters data.
-	 * 
+	 *
 	 * @param string $string
-	 * 
-	 * @return string $string 
+	 *
+	 * @return string $string
 	 */
 	protected function filter($data) {
-		return htmlspecialchars($data,ENT_COMPAT,'UTF-8');
+		return $this->filterBehavior->filter($data);
 	}
-	
+
 }
 
+interface StampFilterBehavior
+{
+	public function filter($data);
+}
+
+class StampHtmlFilterBehavior implements StampFilterBehavior
+{
+	public function filter($data)
+	{
+		return htmlspecialchars($data, ENT_COMPAT, 'UTF-8');
+	}
+}
+
+StampTE::setDefaultFilterBehavior(new StampHtmlFilterBehavior());
 
 //Stamp Exception
 class StampTEException extends InvalidArgumentException {}
