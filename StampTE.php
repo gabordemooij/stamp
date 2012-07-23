@@ -76,7 +76,8 @@ class StampTE {
 	 * Creates an instance of StampTE template using a file.
 	 * 
 	 * @param string $filename file containing HTML input
-	 * @return self 
+	 * 
+	 * @return static 
 	 */
 	public static function load($filename) {
 		if (!file_exists($filename)) throw new StampTEException('Could not find file: '.$filename);
@@ -97,12 +98,12 @@ class StampTE {
 	}
 	
 	/**
-	 * Returns a new instance of StampEngine configured with the template
+	 * Returns a new instance of StampTE configured with the template
 	 * that corresponds to the specified ID.
 	 * 
 	 * @param string $id identifier
 	 * 
-	 * @return StampEngine $snippet 
+	 * @return StampTE $snippet 
 	 */
 	public function get($id) {
 		if (strpos($id,'.')!==false) {
@@ -170,10 +171,10 @@ class StampTE {
 	/**
 	 * Glues a snippet to a glue point in the current snippet/template.
 	 * 
-	 * @param string      $what    ID of the Glue Point you want to append the contents of the snippet to.
-	 * @param StampEngine $snippet a StampEngine snippet/template to be glued at this point
+	 * @param string  $what    ID of the Glue Point you want to append the contents of the snippet to.
+	 * @param StampTE $snippet a StampTE snippet/template to be glued at this point
 	 * 
-	 * @return StampEngine $snippet self, chainable
+	 * @return StampTE $snippet self, chainable
 	 */
 	public function glue($what,$snippet) {
 		$matches=array();
@@ -197,7 +198,7 @@ class StampTE {
 	 * 
 	 * @param array $map list of key=>value pairs to glue
 	 * 
-	 * @return StampEngine $snippet self, chainable  
+	 * @return StampTE $snippet self, chainable  
 	 */
 	public function glueAll($map) {
 		foreach($map as $slot=>$value) {
@@ -222,7 +223,7 @@ class StampTE {
 	 * @param string  $data  the data to inject in the slot
 	 * @param boolean $raw   if TRUE output will not be escaped
 	 * 
-	 * @return StampEngine $snippet self, chainable 
+	 * @return StampTE $snippet self, chainable 
 	 */
 	public function inject($where, $data, $raw=false) {
 		if (!$raw) $data = $this->filter($data);
@@ -237,7 +238,7 @@ class StampTE {
 	 * @param string  $where ID of the slot where to inject the data
 	 * @param string  $data  the data to inject in the slot
 	 *
-	 * @return StampEngine $snippet self, chainable 
+	 * @return StampTE $snippet self, chainable 
 	 */
 	public function injectRaw($where,$data) {
 		return $this->inject($where, $data, true);
@@ -250,7 +251,7 @@ class StampTE {
 	 * @param array $array Array of slot->data pairs
 	 * @param boolean $raw   if TRUE output will not be escaped
 	 * 
-	 * @return StampEngine self, chainable
+	 * @return StampTE self, chainable
 	 */
 	public function injectAll($array,$raw=false) {
 		foreach($array as $key=>$value) {
@@ -271,7 +272,7 @@ class StampTE {
 	/**
 	 * Copies the current snippet/template.
 	 * 
-	 * @return StampEngine $copy Copy of the current template/snippet 
+	 * @return StampTE $copy Copy of the current template/snippet 
 	 */
 	public function copy() {
 		return clone($this);
