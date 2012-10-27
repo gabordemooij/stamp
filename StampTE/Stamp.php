@@ -20,7 +20,10 @@
  *  @license New BSD License
  *  ---------------------------------------------------------------------------
  */
-class StampTE {
+
+namespace StampTE;
+
+class Stamp {
 
 	/**
 	 * Holds the template
@@ -47,6 +50,8 @@ class StampTE {
 	 */
 	private $id;
 	
+	private $sketchBook = array();
+	
 	/**
 	 * Cache array.
 	 * @var array 
@@ -64,13 +69,27 @@ class StampTE {
 		$this->template = $tpl;
 		$this->matches = array();
 		$pattern = '/<!\-\-\scut:(\w+)\s\-\->(.*)?<!\-\-\s\/cut:\1\s\-\->/sU';
-		preg_match_all($pattern, $this->template, $this->matches);
-		$this->template = preg_replace($pattern,'',$this->template);
-		$this->catalogue = array_flip($this->matches[1]);
-		$this->sketchBook = $this->matches[2];
+		//preg_match_all($pattern, $this->template, $this->matches);
+		//print_r($this->matches); exit;
+		$me = $this;
+		$this->template = preg_replace_callback($pattern,function($matches)use($me){
+			list(,$id,$snippet) = $matches;
+			$me->addToSketchBook($id,$snippet);
+			return '<!-- paste:self'.$id.' -->';
+		},$this->template);
+		
+		
+		//exit;
+		//$this->catalogue = array_flip($this->matches[1]);
+		//$this->sketchBook = $this->matches[2];
 		
 	}
 	
+	public function addToSketchBook($id,$snippet) {
+			$this->catalogue[$id] = count($this->sketchBook);
+			$this->sketchBook[] = $snippet;
+	
+	}
 	
 	/**
 	 * Creates an instance of StampTE template using a file.
@@ -308,6 +327,7 @@ class StampTE {
 		$this->cache = unserialize($rawCacheData);
 	}	
 	
+	
 	/**
 	 * Filters data.
 	 * 
@@ -323,4 +343,4 @@ class StampTE {
 
 
 //Stamp Exception
-class StampTEException extends InvalidArgumentException {}
+class StampTEException extends \InvalidArgumentException {}

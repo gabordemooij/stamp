@@ -41,15 +41,17 @@ function testpack($name) {
 }
 
 
-require('StampTE.php');
+require('StampTE/Stamp.php');
 
+use StampTE\Stamp;
+use StampTE\StampTEException;
 
 
 testpack("Basics");
 
 
 $template = '<message>#greet#</message>';
-$s = new StampTE($template);
+$s = new Stamp($template);
 $s->inject('greet','<HELLO>');
 
 asrt('<message>&lt;HELLO&gt;</message>',$s->__toString());
@@ -57,28 +59,28 @@ asrt('<message>&lt;HELLO&gt;</message>',$s->__toString());
 
 
 //does the StampTE class exist?
-if (class_exists('StampTE')) pass();
+if (class_exists('Stamp')) pass();
 
 //Can we succesfully create an instance of the StampTE class?
-$stamp = new StampTE('');
+$stamp = new Stamp('');
 
 //Test the wash() function
 $template = "HELL<!-- paste:me -->OWORLD";
-$stamp = new StampTE($template);
+$stamp = new Stamp($template);
 asrt("HELLOWORLD",trim($stamp));
 
 
 $template = "HELL<!-- paste:me(and,me) -->OWORLD";
-$stamp = new StampTE($template);
+$stamp = new Stamp($template);
 asrt("HELLOWORLD",trim($stamp));
 
 $template = "HELL<!-- paste:test -->OWORLD";
-$stamp = new StampTE($template);
+$stamp = new Stamp($template);
 asrt("HELLOWORLD",trim($stamp));
 
 
 $template = "HELL<!-- cut:wow -->OW<!-- /cut:wow -->ORLD";
-$stamp = new StampTE($template);
+$stamp = new Stamp($template);
 asrt("HELLORLD",trim($stamp));
 
 
@@ -87,7 +89,7 @@ $template = "HELLO
 
 
 WORLD";
-$stamp = new StampTE($template);
+$stamp = new Stamp($template);
 asrt("HELLO
 WORLD",trim($stamp));
 
@@ -107,7 +109,7 @@ $template = "
 	</bowl>
 ";
 
-$stamp = new StampTE($template);
+$stamp = new Stamp($template);
 $fish = $stamp->get("fish");
 $stamp->glue('water',$fish);
 
@@ -144,7 +146,7 @@ $template = "
 ";
 
 
-$stamp = new StampTE($template);
+$stamp = new Stamp($template);
 $fish = $stamp->get("fish");
 $stamp->glue('water',$fish);
 
@@ -164,7 +166,7 @@ asrt(clean($stamp),clean($expectation));
 
 //Can we put more than one fish in the bowl?
 
-$stamp = new StampTE($template);
+$stamp = new Stamp($template);
 $fish = $stamp->get("fish");
 $stamp->glue('water',$fish);
 $stamp->glue('water',$fish);
@@ -207,7 +209,7 @@ $template = "
 	</bowl>
 ";
 
-$stamp = new StampTE($template);
+$stamp = new Stamp($template);
 $redfish = $stamp->get("redfish");
 $yellowfish = $stamp->get("yellowfish");
 $stamp->glue('bowl1',$redfish);
@@ -249,7 +251,7 @@ $template = "
 	</bowl>
 ";
 
-$stamp = new StampTE($template);
+$stamp = new Stamp($template);
 $redfish = $stamp->get("redfish");
 $yellowfish = $stamp->get("yellowfish");
 $stamp->glue('bowl1',$redfish);
@@ -291,7 +293,7 @@ $template = "
 	</bowl>
 ";
 
-$stamp = new StampTE($template);
+$stamp = new Stamp($template);
 $redfish = $stamp->get("fish");
 $redfish->inject('color','red');
 $yellowfish = $stamp->get("fish");
@@ -343,7 +345,7 @@ $template = "
 	</bowl>
 ";
 
-$stamp = new StampTE($template);
+$stamp = new Stamp($template);
 $redfish = $stamp->get("fish");
 $redfish->inject('color','red');
 $greenfish = $stamp->get("fish");
@@ -409,7 +411,7 @@ $template = "
 	</bowl>
 ";
 
-$stamp = new StampTE($template);
+$stamp = new Stamp($template);
 $redfish = $stamp->get("fish");
 $redfish->inject('color','red');
 $greenfish = $stamp->get("fish");
@@ -456,7 +458,7 @@ $template = "
 	</garden>
 ";
 
-$stamp = new StampTE($template);
+$stamp = new Stamp($template);
 $flower1 = $stamp->get('flower')->copy();
 $flower2 = $stamp->get('flower')->copy();
 $flowers = array('flowers'=>array($flower1,$flower2));
@@ -482,7 +484,7 @@ $template = "
 	</garden>
 ";
 
-$stamp = new StampTE($template);
+$stamp = new Stamp($template);
 $flower = $stamp->get('flower')->copy();
 $flower2 = $flower->copy();
 $flower->inject('type','lily');
@@ -514,7 +516,7 @@ $template = "
 	</garden>
 ";
 
-$stamp = new StampTE($template);
+$stamp = new Stamp($template);
 $flower = $stamp->get('flower')->copy();
 $flower2 = $flower->copy();
 $flower->inject('type','lily');
@@ -537,39 +539,39 @@ asrt(clean($stamp),clean($expectation));
 
 testpack('Infinte loop - no longer an issue, preserving tests.');
 $template = '<!-- cut:hello -->hello there';
-$stamp = new StampTE($template);
+$stamp = new Stamp($template);
 asrt(strval($stamp),'<!-- cut:hello -->hello there');
 	
-$stamp = new StampTE('<!-- cut:hello ');
+$stamp = new Stamp('<!-- cut:hello ');
 asrt(strval($stamp),'<!-- cut:hello');
 
 testpack('Wrong regions');
-$stamp = new StampTE('data<!-- cut:and logic');
+$stamp = new Stamp('data<!-- cut:and logic');
 pass();
-$stamp = new StampTE('cut:end --!> without a beginning.');
+$stamp = new Stamp('cut:end --!> without a beginning.');
 pass();
-$stamp = new StampTE('--!>');
+$stamp = new Stamp('--!>');
 pass();
-$stamp = new StampTE('<!--');
+$stamp = new Stamp('<!--');
 pass();
-$stamp = new StampTE('<!-- cut:logic -->');
+$stamp = new Stamp('<!-- cut:logic -->');
 pass();
-$stamp = new StampTE('<!-- /cut:logic -->');
+$stamp = new Stamp('<!-- /cut:logic -->');
 pass();
-$stamp = new StampTE('a<!-- cut:chest -->treasure<!-- /cut:chest -->b');
+$stamp = new Stamp('a<!-- cut:chest -->treasure<!-- /cut:chest -->b');
 asrt(strval($stamp->get('chest')),'treasure');
 pass();
-$stamp = new StampTE('a<!-- cut:chest -->treasure<!-- /cut:chest -->b');
+$stamp = new Stamp('a<!-- cut:chest -->treasure<!-- /cut:chest -->b');
 asrt(strval($stamp->get('chest')),'treasure');
 pass();
-$stamp = new StampTE('a<!-- cut:chest -->treasure<!-- /cat:chest -->b');
+$stamp = new Stamp('a<!-- cut:chest -->treasure<!-- /cat:chest -->b');
 asrt(strval($stamp) ,'a<!-- cut:chest -->treasure<!-- /cat:chest -->b');
 
 
 testpack('Test Filters');
 $template = '<b>#test#</b>';
 
-class InternationalStampTE extends StampTE {
+class InternationalStampTE extends Stamp {
 
 	
 	protected function filter($data) {
@@ -589,7 +591,7 @@ asrt(strval($stamp),'<b>Allo</b>');
 
 testpack('Test Cleaning');
 
-$stamp = new StampTE('Test <!-- paste:test --> test <!-- cut:piece -->piece<!-- /cut:piece -->');
+$stamp = new Stamp('Test <!-- paste:test --> test <!-- cut:piece -->piece<!-- /cut:piece -->');
 $str = strval($stamp);
 asrt(strpos('<!--',$str),false);
 $p = $stamp->get('piece');
