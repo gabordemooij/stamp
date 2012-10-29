@@ -35,10 +35,29 @@ class UIElement {
 			$this->select = 'self'.$stamp->stampTemplate->getID();
 		}
 		$this->stampTemplate->glue($this->select,$stamp->stampTemplate);
+		$this->select = null; //reset
+		
 	}
 	
 	public function __toString() {
 		return strval( $this->stampTemplate );
+	}
+	
+	public function copy() {
+		return new self( $this->stampTemplate->copy() );
+	}
+	
+	public function collect($collect) {
+		$items = array();
+		$stamps = $this->stampTemplate->collect($collect);
+		foreach($stamps as $stamp) {
+			$items[] = new self($stamp);
+		}
+		return $items;
+	}
+	
+	public function getTemplate() {
+		return $this->stampTemplate;
 	}
 	
 }

@@ -42,6 +42,7 @@ function testpack($name) {
 
 
 require('StampTE/Stamp.php');
+require('StampTE/StampTEException.php');
 
 use StampTE\Stamp;
 use StampTE\StampTEException;

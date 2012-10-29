@@ -21,9 +21,7 @@
  *  ---------------------------------------------------------------------------
  */
 
-namespace StampTE;
-
-class Stamp {
+class StampTE {
 
 	/**
 	 * Holds the template
@@ -52,6 +50,11 @@ class Stamp {
 	
 	private $sketchBook = array();
 	
+	private $slots = array();
+	
+	
+	private $select = null;
+	
 	/**
 	 * Cache array.
 	 * @var array 
@@ -68,21 +71,41 @@ class Stamp {
 		$this->id = $id;
 		$this->template = $tpl;
 		$this->matches = array();
-		$pattern = '/<!\-\-\scut:(\w+)\s\-\->(.*)?<!\-\-\s\/cut:\1\s\-\->/sU';
-		//preg_match_all($pattern, $this->template, $this->matches);
-		//print_r($this->matches); exit;
+		$pattern = '/<!\-\-\s(cut|slot):(\w+)\s\-\->(.*)?<!\-\-\s\/(cut|slot):\2\s\-\->/sU';
 		$me = $this;
 		$this->template = preg_replace_callback($pattern,function($matches)use($me){
-			list(,$id,$snippet) = $matches;
-			$me->addToSketchBook($id,$snippet);
-			return '<!-- paste:self'.$id.' -->';
+			list(,$type,$id,$snippet) = $matches;
+			if ($type === 'cut') {
+				$me->addToSketchBook($id,$snippet);
+				return '<!-- paste:self'.$id.' -->';
+			}
+			else {
+				$me->addToSlots($id);
+				return "#$id#";
+			}
 		},$this->template);
 		
-		
-		//exit;
-		//$this->catalogue = array_flip($this->matches[1]);
-		//$this->sketchBook = $this->matches[2];
-		
+	}
+
+	public function getGluePoints() {
+		$gluePoints = array();
+		if (preg_match_all('/<!\-\-\spaste:(\w+)\s\-\->/',$this->template,$gluePoints)){
+			$gluePoints = array_flip($gluePoints[1]);
+		}
+		return $gluePoints;
+	}
+	
+	public function getSlots() {
+		return $this->slots;
+	}
+	
+	
+	/**
+	 * Adds a slot to the map of slots.
+	 * @param type $id 
+	 */
+	public function addToSlots($id) {
+		$this->slots[$id] = true;
 	}
 	
 	public function addToSketchBook($id,$snippet) {
@@ -149,7 +172,7 @@ class Stamp {
 	 * will be returned as an array so you can obtain them using the list()
 	 * statement.
 	 * 
-	 * @param string $list List of IDs you want to fetch from template
+	 * @param string  $list  List of IDs you want to fetch from template
 	 * 
 	 * @return array $snippets Snippets obtained from template 
 	 */
@@ -337,6 +360,33 @@ class Stamp {
 	 */
 	protected function filter($data) {
 		return htmlspecialchars($data,ENT_COMPAT,'UTF-8');
+	}
+	
+	
+	public function &__get($gluePoint) {
+		$this->select = $gluePoint;
+		return $this;
+	}
+	
+	
+	public function __call($method,$arguments) {
+		if (strpos($method,'get')===0) {
+			return $this->get(lcfirst(substr($method,3)));
+		}
+		if (strpos($method,'set')===0) {
+			$this->inject(strtolower(substr($method,3)),$arguments[0]);
+			return $this;
+		}
+	}
+	
+	public function add($stamp) {
+		if ($this->select === null) {
+			$this->select = 'self'.$stamp->getID();
+		}
+		echo $this->select;
+		$this->glue($this->select,$stamp);
+		$this->select = null; //reset
+		
 	}
 	
 }
