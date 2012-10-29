@@ -48,15 +48,36 @@ class StampTE {
 	 */
 	private $id;
 	
+	/**
+	 * A Stamp contains a sketchbook with snippets to generate new
+	 * stamps from. This way StampTE allows lazy initialization of 
+	 * new Stamps as soon as they are fetched using the get() command.
+	 * 
+	 * @var array 
+	 */
 	private $sketchBook = array();
 	
+	/**
+	 * List of slots in the current Stamp.
+	 * Mainly for introspection by smart template processors.
+	 * 
+	 * @var array
+	 */
 	private $slots = array();
 	
-	
+	/**
+	 * Selector ID. The currently selected Glue Point.
+	 * A Glue Point can be selected using a magic getter.
+	 * The ID for this magically selected Glue Point is stored in this
+	 * variable.
+	 * 
+	 * @var string 
+	 */
 	private $select = null;
 	
 	/**
-	 * Cache array.
+	 * Cache array. Cache keeps the planet from burning up.
+	 * 
 	 * @var array 
 	 */
 	private $cache = array();
@@ -87,6 +108,13 @@ class StampTE {
 		
 	}
 
+	/**
+	 * A stupid method that just returns all the glue points in the template.
+	 * Only use this method if you're planning to do some wise-ass shit.
+	 * It's ugly, and horribly slow. 
+	 * 
+	 * @return array 
+	 */
 	public function getGluePoints() {
 		$gluePoints = array();
 		if (preg_match_all('/<!\-\-\spaste:(\w+)\s\-\->/',$this->template,$gluePoints)){
@@ -95,10 +123,17 @@ class StampTE {
 		return $gluePoints;
 	}
 	
+	
+	/**
+	 * Returns the slots in this Stamp.
+	 * Normally you don't need them but there are some smartypants template processors out there
+	 * that do.
+	 * 
+	 * @return array 
+	 */
 	public function getSlots() {
 		return $this->slots;
 	}
-	
 	
 	/**
 	 * Adds a slot to the map of slots.
@@ -108,10 +143,16 @@ class StampTE {
 		$this->slots[$id] = true;
 	}
 	
+	/**
+	 * Internal method that needs to be public because PHP is too stupid to understand
+	 * $this in closures.
+	 * 
+	 * @param string $id
+	 * @param string $snippet 
+	 */
 	public function addToSketchBook($id,$snippet) {
 			$this->catalogue[$id] = count($this->sketchBook);
 			$this->sketchBook[] = $snippet;
-	
 	}
 	
 	/**
@@ -212,9 +253,10 @@ class StampTE {
 	
 	/**
 	 * Glues a snippet to a glue point in the current snippet/template.
+	 * The glue() method also accepts raw strings.
 	 * 
 	 * @param string  $what    ID of the Glue Point you want to append the contents of the snippet to.
-	 * @param StampTE $snippet a StampTE snippet/template to be glued at this point
+	 * @param StampTE|string   $snippet a StampTE snippet/template to be glued at this point 
 	 * 
 	 * @return StampTE $snippet self, chainable
 	 */
@@ -363,12 +405,26 @@ class StampTE {
 	}
 	
 	
+	/**
+	 * Selects a Glue Point to attach a Stamp to.
+	 * Note that although this seems like a getter this method
+	 * actually returns the same StampTE. It's both evil and beautiful at the same time.
+	 *  
+	 * @param string $gluePoint
+	 * 
+	 * @return StampTE 
+	 */
 	public function &__get($gluePoint) {
 		$this->select = $gluePoint;
 		return $this;
 	}
 	
-	
+	/**
+	 * Call interceptor.
+	 * Intercepts:
+	 *				- getX(), routes to get('X')
+	 *				- setX(Y), routes to inject('X',Y)
+	 */
 	public function __call($method,$arguments) {
 		if (strpos($method,'get')===0) {
 			return $this->get(lcfirst(substr($method,3)));
@@ -379,18 +435,21 @@ class StampTE {
 		}
 	}
 	
-	public function add($stamp) {
+	/**
+	 * Glues the specified Stamp object to the currently selected
+	 * Glue Point.
+	 * 
+	 * @param StampTE $stamp 
+	 */
+	public function add(StampTE $stamp) {
 		if ($this->select === null) {
 			$this->select = 'self'.$stamp->getID();
 		}
-		echo $this->select;
 		$this->glue($this->select,$stamp);
 		$this->select = null; //reset
-		
 	}
 	
 }
-
 
 //Stamp Exception
 class StampTEException extends \InvalidArgumentException {}
