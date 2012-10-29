@@ -592,6 +592,55 @@ $expectation = '
 ';
 asrt(trim(strval($stampTE)),trim($expectation));
 
+testpack('Test Dummy Slots');
+
+$stampTE = new StampTE('<b><!-- slot:lorem -->ipsum<!-- /slot:lorem --></b>');
+$stampTE->inject('lorem','Hello');
+asrt(trim(strval($stampTE)),'<b>Hello</b>');
+
+testpack('Magic API');
+
+//Complex, put lily in pond
+$template = "
+	<garden>
+		<water>
+			<!-- paste:pond -->
+		</water>
+		<!-- paste:flowers -->
+		<!-- cut:flower -->
+		<flower type=\"#type#\"></flower>
+		<!-- /cut:flower -->
+	</garden>
+";
+
+$StampTE = new StampTE($template);
+$flower = $StampTE->getFlower()->copy();
+$flower2 = $flower->copy();
+$flower->setType('lily');
+$pond = $StampTE->pond->add($flower);
+$flower2->setType('phlox');
+$StampTE->flowers->add($flower2);
+$expectation = "
+	<garden>
+		<water>
+			<flower type=\"lily\"></flower>
+		</water>
+		<flower type=\"phlox\"></flower>
+	</garden>
+";
+
+asrt(clean($StampTE),clean($expectation));
+
+testpack('Test Introspection');
+$gluePoints = $StampTE->getGluePoints();
+asrt($gluePoints[0],'pond');
+asrt($gluePoints[1],'flowers');
+asrt($gluePoints[2],'selfflower');
+
+$stampTE = new StampTE('<!-- slot:castle --><!-- /slot:castle -->');
+$slots = $stampTE->getSlots();
+asrt(isset($slots['castle']),true);
+
 testpack('Test Filters');
 $template = '<b>#test#</b>';
 

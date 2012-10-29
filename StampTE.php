@@ -118,7 +118,7 @@ class StampTE {
 	public function getGluePoints() {
 		$gluePoints = array();
 		if (preg_match_all('/<!\-\-\spaste:(\w+)\s\-\->/',$this->template,$gluePoints)){
-			$gluePoints = array_flip($gluePoints[1]);
+			$gluePoints = ($gluePoints[1]);
 		}
 		return $gluePoints;
 	}
