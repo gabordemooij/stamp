@@ -2,95 +2,77 @@
 
 require('StampTE.php');
 
-$template = '
-<div>
-	<!-- cut:diamond -->
-		<img src="diamond.gif" />
-	<!-- /cut:diamond -->
-</div>	
-<div id="box">
-		<!-- paste:jewellery -->
-	</div>	
+
+$t = '
+<table>
+<thead><tr><th>Pizza</th><th>Price</th></tr></thead>
+<tbody>
+<!-- cut:pizza -->
+<tr><td>#name#</td><td>#price#</td></tr>
+<!-- /cut:pizza -->
+</tbody>
+</table>
 ';
 
-$se = new StampTE($template);
-$diamond = $se->get('diamond');
-echo $diamond;
-$diamond = $se->get('diamond');
-$se->glue('jewellery',$diamond);
-echo $se;
-
-$template = '
-	<!-- cut:form -->
-	<form action="#action#" method="#method#">
-		<!-- paste:formElements -->
-		<!-- cut:textfield -->
-			<label>#label#</label>
-			<input type="text" name="#name#" value="#value#" />
-		<!-- /cut:textfield -->
-		<input type="submit" name="#send#" />
-	</form>
-	<!-- /cut:form -->
-';
-
-
-$se = new StampTE($template);
-list($form,$textfield) = $se->collect('form|form.textfield');
-
-$form->glue('formElements',
-	$textfield->copy()->injectAll(array(
-			'label'=>'Your name',
-			'name'=>'username',
-			'value'=>'...your name please...'))
-	)->inject('send','Update your Profile');
-
-echo $form;
-
-$template =  "
-	
-
-	<!-- cut:table -->
-	<table>
-		<thead>
-			<tr>
-				<!-- paste:columns(column,data) -->
-				<!-- cut:column -->
-				<th>#column#</th>
-				<!-- /cut:column -->
-			</tr>
-		</thead>
-		<tbody>
-			<!-- paste:rows -->
-			<!-- cut:row -->
-			<tr>
-				<!-- paste:cells -->
-				<!-- cut:cell -->
-				<td>#cell#</td>
-				<!-- /cut:cell -->
-			</tr>
-			<!-- /cut:row -->
-		</tbody>
-	</table>
-	<!-- /cut:table -->
-";
+$data = array(
+	'Magaritha' => '6.99',
+	'Funghi' => '7.50',
+	'Tonno' => '7.99'
+);
 
 
 
+$priceList = new StampTE($t);
 
-$columns = array('Pizza','Price');
-$data = array(array('Pepperoni','7.99'),array('Veggie','6.99'));
+$dish = $priceList->getPizza(); 
 
-
-
-
-$se = new StampTE($template);
-list($table,$columnHead,$row,$cell) = $se->collect('table|table.column|table.row|table.row.cell');
-foreach($columns as $column) $table->glue('columns',$columnHead->copy()->inject('column',$column));
-foreach($data as $pizzaInfoLine) {
-	$pizzaRow = $row->copy();
-	foreach($pizzaInfoLine as $pizzaInfo) {
-		$pizzaRow->glue('cells',$cell->copy()->inject('cell',$pizzaInfo));
-	}
-	$table->glue('rows',$pizzaRow);
+foreach($data as $name=>$price) {
+	$pizza = $dish->copy(); 
+	$pizza->setName($name);
+	$pizza->setPrice($price);
+	$priceList->add( $pizza ); 
 }
-echo $table;
+
+echo $priceList;
+//exit;
+
+
+$t = '
+<form action="#action#" method="post">
+<!-- cut:textField -->
+<label>#label#</label><input type="text" name="#name#" value="#value#" />
+<!-- /cut:textField -->
+</form>
+';
+
+$form = new StampTE($t);
+
+$textField = $form->getTextField();
+$textField->setLabel('Your Name')
+	->setName('person')
+	->setValue('It\'s me!');
+
+
+$form->add($textField);
+echo "\n\n\n\n".$form;
+
+
+
+$vt = '<div id="forest"><div id="village"><!-- paste:village --></div></div>';
+$bt = '
+	<div class="catalogue">
+		<!-- cut:tavern -->
+			<img src="tavern.gif" />
+		<!-- /cut:tavern -->
+	</div>
+';
+
+$v = new StampTE($vt);
+$b = new StampTE($bt);
+$tavern = $b->getTavern();
+$v->village->add($tavern);
+
+echo "\n\n\n".$v;
+
+
+
