@@ -36,6 +36,9 @@ and stored under the specified ID.
     <!-- /cut:diamond -->
     </div>
 
+    <span>
+    <!-- paste:jewellery -->
+    </span>
 
 Now pass the template to StampTE:
 
@@ -43,17 +46,23 @@ Now pass the template to StampTE:
 
 To obtain the diamond image:
 
-    echo $se->get('diamond');
+    $diamond = $se->getDiamond();
+    echo $diamond;
 
 Result:
 
 
     <img src="diamond.gif" />
 
+And.. to put some diamonds in the jewellery box:
 
+
+    $se->jewellery->add($diamond);
+    	
+
+Easy!
 
 More info: http://www.stampte.com
-
 
 
 Advantages
