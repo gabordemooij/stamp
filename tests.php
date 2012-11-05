@@ -669,4 +669,82 @@ $StampTE->glue('test',$p);
 $str = strval($StampTE);
 asrt(strpos('<!--',$str),false);
 
+testpack('Test Translator');
+$template = '
+	<table>
+	<!-- cut:fishBowl -->
+		<bowl>
+			<fish>#blub#</fish>
+			<!-- cut:castle -->
+				<castle>#diamond#</castle>
+			<!-- /cut:castle -->
+		</bowl>
+	<!-- /cut:fishBowl -->
+	</table>
+';
+$stampTE = new StampTE($template);
+$dict = array(
+	'Fish.Sound' => 'Blub Blub %s',
+	'Diamond' => 'Wanda'
+);
+$stampTE->setTranslator(function($word,$params=array()){
+	global $dict;
+	return vsprintf($dict[$word],$params);
+});
+$bowl = $stampTE->getFishBowl();
+asrt(clean($bowl),'<bowl><fish>#blub#</fish></bowl>');
+$bowl->sayBlub('Fish.Sound',array('says the fish'));
+asrt(clean($bowl),'<bowl><fish>BlubBlubsaysthefish</fish></bowl>');
+$castle = $bowl->getCastle();
+$castle->sayDiamond('Diamond');
+asrt(clean($castle),'<castle>Wanda</castle>');
+$castle = $stampTE->get('fishBowl.castle');
+$castle->setDiamond('Diamond');
+asrt(clean($castle),'<castle>Diamond</castle>');
+$castle = $stampTE->get('fishBowl.castle');
+$castle->sayDiamond('Diamond');
+asrt(clean($castle),'<castle>Wanda</castle>');
+
+testpack('Test Factory');
+class Pirahna extends StampTE {
+	public function isHungry() {
+		return 'Sure';
+	}
+}
+$stampTE->setFactory(function($stamp,$id) {
+	if ($id=='fishBowl') {
+		return new Pirahna($stamp,$id);
+	}
+	else {
+		return new StampTE($stamp,$id);
+	}
+});
+
+
+$fish = $stampTE->getFishBowl();
+asrt('Sure',$fish->isHungry());
+$castle = $stampTE->get('fishBowl.castle');
+asrt(null,$castle->isHungry());
+
+class Castle extends StampTE { 
+	public function isCastle() { return 'Yes'; }
+}
+
+$stampTE->setFactory(function($stamp,$id) {
+	if ($id=='castle') {
+		return new Castle($stamp,$id);
+	}
+	else {
+		return new StampTE($stamp,$id);
+	}
+});
+
+$castle = $stampTE->get('fishBowl.castle');
+asrt('Yes',$castle->isCastle());
+$fish = $stampTE->getFishBowl();
+asrt(null,$fish->isHungry());
+$castle = $fish->getCastle();
+asrt('Yes',$castle->isCastle());
+
+
 exit(0);

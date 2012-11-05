@@ -81,6 +81,22 @@ class StampTE {
 	 * @var array 
 	 */
 	private $cache = array();
+	
+	/**
+	 * Holds the translator function to be used for
+	 * translations.
+	 * 
+	 * @var closure
+	 */
+	protected $translator = null;
+	
+	/**
+	 * Holds the factory function to be used whenever
+	 * a Stamp template is returned.
+	 * 
+	 * @var closure 
+	 */
+	protected $factory = null;
 
 	/**
 	 * Constructor. Pass nothing if you plan to use cache.
@@ -197,7 +213,15 @@ class StampTE {
 		}
 		if ($this->inCatalogue($id)) {
 			$snippet = $this->sketchBook[$this->catalogue[$id]];
-			$new = new static($snippet,$id);
+			if ($this->factory) {
+				$new = call_user_func_array($this->factory,array($snippet,$id));
+			}
+			else {
+				$new = new static($snippet,$id);
+			}
+			//Pass the translator and the factory.
+			$new->translator = $this->translator;
+			$new->factory = $this->factory;
 		}
 		if (isset($parts)) { 
 			return $new->get($rest);
@@ -429,8 +453,12 @@ class StampTE {
 		if (strpos($method,'get')===0) {
 			return $this->get(lcfirst(substr($method,3)));
 		}
-		if (strpos($method,'set')===0) {
+		elseif (strpos($method,'set')===0) {
 			$this->inject(strtolower(substr($method,3)),$arguments[0]);
+			return $this;
+		}
+		elseif (strpos($method,'say')===0) {
+			$this->inject(strtolower(substr($method,3)),  call_user_func_array($this->translator,$arguments));
 			return $this;
 		}
 	}
@@ -447,6 +475,32 @@ class StampTE {
 		}
 		$this->glue($this->select,$stamp);
 		$this->select = null; //reset
+	}
+	
+	/**
+	 * Sets the translator function to be used for translations.
+	 * The translator function will be called automatically as soon as you invoke the magic 
+	 * method:
+	 * 
+	 * sayX(Y) where X is the slot you want to inject the contents of Y into.
+	 * 
+	 * Note that optional arguments are allowed and passed to the translator.
+	 * 
+	 * @param closure $closure 
+	 */
+	public function setTranslator($closure) {
+		$this->translator = $closure;
+	}
+	
+	/**
+	 * Sets the object factory. If get(X) gets called StampTE will call the
+	 * factory with template and ID for X to give you the opportunity to 
+	 * wrap the template object in your own wrapper class.
+	 * 
+	 * @param closure $factory 
+	 */
+	public function setFactory($factory) {
+		$this->factory = $factory;
 	}
 	
 }
