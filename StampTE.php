@@ -222,13 +222,18 @@ class StampTE {
 			//Pass the translator and the factory.
 			$new->translator = $this->translator;
 			$new->factory = $this->factory;
-		}
-		if (isset($parts)) { 
+		
+			if (isset($parts)) { 
 			return $new->get($rest);
+			}
+			else {
+				return $new;
+			}
 		}
 		else {
-			return $new;
+			throw new StampTEException('Cannot find Stamp Snippet with ID '.preg_replace('/\W/','',$id));
 		}
+		
 	}
 	
 	/**

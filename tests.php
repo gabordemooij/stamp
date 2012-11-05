@@ -746,5 +746,13 @@ asrt(null,$fish->isHungry());
 $castle = $fish->getCastle();
 asrt('Yes',$castle->isCastle());
 
+testpack('Test error handling');
+
+try{ $stampTE->get('unknown'); fail(); }catch(StampTEException $e){ pass(); }
+try{ $stampTE->getUnknown(); fail(); }catch(StampTEException $e){ pass(); }
+try{ $stampTE->get('unknown.unknown'); fail(); }catch(StampTEException $e){ pass(); }
+try{ $stampTE->get('fishBowl.unknown'); fail(); }catch(StampTEException $e){ pass(); }
+try{ $stampTE->get('fishBowl.castle.unknown'); fail(); }catch(StampTEException $e){ pass(); }
+
 
 exit(0);
