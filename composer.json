@@ -1,5 +1,5 @@
 {
-    "name": "gabordemooij/redbean",
+    "name": "gabordemooij/stamp",
     "type": "library",
     "description": "Clean and powerful template engine for PHP, transforms HTML into object tree for PHP usage without touching design.",
     "keywords": ["template","Template Engine"],
