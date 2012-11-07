@@ -754,5 +754,18 @@ try{ $stampTE->get('unknown.unknown'); fail(); }catch(StampTEException $e){ pass
 try{ $stampTE->get('fishBowl.unknown'); fail(); }catch(StampTEException $e){ pass(); }
 try{ $stampTE->get('fishBowl.castle.unknown'); fail(); }catch(StampTEException $e){ pass(); }
 
+testpack('Test strtolower issue with magic setter');
+
+$template = '#helloWorld#';
+$stampTE = new StampTE($template);
+$stampTE->setHelloWorld('Hi');
+asrt(strval($stampTE),'Hi');
+
+$template = '#helloWorld#';
+$stampTE = new StampTE($template);
+$stampTE->setTranslator(function($a){ return $a;});
+$stampTE->sayHelloWorld('Hi');
+asrt(strval($stampTE),'Hi');
+
 
 exit(0);

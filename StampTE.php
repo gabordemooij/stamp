@@ -459,11 +459,11 @@ class StampTE {
 			return $this->get(lcfirst(substr($method,3)));
 		}
 		elseif (strpos($method,'set')===0) {
-			$this->inject(strtolower(substr($method,3)),$arguments[0]);
+			$this->inject(lcfirst(substr($method,3)),$arguments[0]);
 			return $this;
 		}
 		elseif (strpos($method,'say')===0) {
-			$this->inject(strtolower(substr($method,3)),  call_user_func_array($this->translator,$arguments));
+			$this->inject(lcfirst(substr($method,3)),  call_user_func_array($this->translator,$arguments));
 			return $this;
 		}
 	}
