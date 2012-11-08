@@ -27,7 +27,7 @@ class StampTE {
 	 * Holds the template
 	 * @var string
 	 */
-	private $template; 
+	protected $template; 
 	
 	/**
 	 * Collection of initial matches from template
