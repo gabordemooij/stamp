@@ -480,6 +480,7 @@ class StampTE {
 		}
 		$this->glue($this->select,$stamp);
 		$this->select = null; //reset
+		return $this;
 	}
 	
 	/**
