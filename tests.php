@@ -767,5 +767,38 @@ $stampTE->setTranslator(function($a){ return $a;});
 $stampTE->sayHelloWorld('Hi');
 asrt(strval($stampTE),'Hi');
 
+testpack('Security Test');
+$t = '<input type="#type#" value="#value#">';
+$s = new StampTE($t);
+$s->setValue('#&type#');
+$s->setType('text');
+asrt(trim($s),'<input type="text" value="#&amp;type#">');
 
+$t = '<input type="#type#" value="#value#">';
+$s = new StampTE($t);
+$s->setValue('#type#');
+$s->setType('text');
+asrt(trim($s),'<input type="text" value="#type#">');
+
+$t = '<input type="#type#" value="#value#">';
+$s = new StampTE($t);
+$s->injectRaw('value','#&type#');
+$s->setType('text');
+asrt(trim($s),'<input type="text" value="text">');
+
+$t = '<div>#slot#</div>';
+$s = new StampTE($t);
+$s->inject('slot','<b><!-- paste:hello --></b>');
+$s->hello->add(new StampTE('<x>'));
+asrt(trim($s),'<div>&lt;b&gt;&lt;!-- paste:hello --&gt;&lt;/b&gt;</div>');
+
+$t = '<div>#slot#</div>';
+$s = new StampTE($t);
+$s->injectRaw('slot','<b><!-- paste:hello --></b>');
+$s->hello->add(new StampTE('<x>'));
+asrt(trim($s),'<div><b><x></b></div>');
+
+echo PHP_EOL;
+echo '--- DONE ---';
+echo PHP_EOL;
 exit(0);
