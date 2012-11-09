@@ -121,7 +121,8 @@ class StampTE {
 				return "#$id#";
 			}
 		},$this->template);
-		
+		$this->template = preg_replace('/#(\w+)#/sU','#&$1#',$this->template);		
+
 	}
 
 	/**
@@ -343,7 +344,7 @@ class StampTE {
 	 */
 	public function inject($where, $data, $raw=false) {
 		if (!$raw) $data = $this->filter($data);
-		$where = "#$where#";
+		$where = "#&$where#";
 		$this->template = str_replace($where,$data,$this->template);
 		return $this;
 	}

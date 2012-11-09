@@ -692,7 +692,7 @@ $stampTE->setTranslator(function($word,$params=array()){
 	return vsprintf($dict[$word],$params);
 });
 $bowl = $stampTE->getFishBowl();
-asrt(clean($bowl),'<bowl><fish>#blub#</fish></bowl>');
+asrt(clean($bowl),'<bowl><fish>#&blub#</fish></bowl>');
 $bowl->sayBlub('Fish.Sound',array('says the fish'));
 asrt(clean($bowl),'<bowl><fish>BlubBlubsaysthefish</fish></bowl>');
 $castle = $bowl->getCastle();
