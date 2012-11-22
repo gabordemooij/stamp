@@ -798,6 +798,46 @@ $s->injectRaw('slot','<b><!-- paste:hello --></b>');
 $s->hello->add(new StampTE('<x>'));
 asrt(trim($s),'<div><b><x></b></div>');
 
+testpack('Test optional slot marker');
+
+$t = '<div>#slot?#</div>';
+$s = new StampTE($t);
+asrt(trim($s),'<div></div>');
+
+$t = '<div>#slot?#</div><div>#slot2?#</div>';
+$s = new StampTE($t);
+asrt(trim($s),'<div></div><div></div>');
+
+$t = '<div>#slot?#</div>';
+$s = new StampTE($t);
+$s->setSlot('Boo!');
+asrt(trim($s),'<div>Boo!</div>');
+
+$t = '<div>#slot?#</div><div>#slot?#</div>';
+$s = new StampTE($t);
+$s->setSlot('Boo!');
+asrt(trim($s),'<div>Boo!</div><div>Boo!</div>');
+
+$t = '<div>#slot?#</div>';
+$s = new StampTE($t);
+$s->setSlot('#Boo?#');
+$s->setBoo('Baa');
+asrt(trim($s),'<div>#Boo?#</div>');
+
+$t = '<div>#slot?#</div>';
+$s = new StampTE($t);
+$s->setSlot('#&Boo?#');
+$s->setBoo('Baa');
+asrt(trim($s),'<div>#&amp;Boo?#</div>');
+
+$t = '<div>#slot?#</div>';
+$s = new StampTE($t);
+$s->setSlot('#&Boo#');
+$s->setBoo('Baa');
+asrt(trim($s),'<div>#&amp;Boo#</div>');
+
+
+
 echo PHP_EOL;
 echo '--- DONE ---';
 echo PHP_EOL;

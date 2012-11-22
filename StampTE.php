@@ -121,7 +121,7 @@ class StampTE {
 				return "#$id#";
 			}
 		},$this->template);
-		$this->template = preg_replace('/#(\w+)#/sU','#&$1#',$this->template);		
+		$this->template = preg_replace('/#(\w+)(\?)?#/sU','#&$1$2#',$this->template);		
 
 	}
 
@@ -268,6 +268,7 @@ class StampTE {
 		$template = $this->template;
 		$template = preg_replace("/<!--\s*(paste):[a-zA-Z0-9\(\),\/]*\s*-->/m","",$template);
     	$template = preg_replace("/\n[\n\t\s]*\n/m","\n",$template);
+		$template = preg_replace("/#\&\w+\?#/m","",$template);
     	$template = trim($template);
 		return $template;
 	}
@@ -342,10 +343,12 @@ class StampTE {
 	 * 
 	 * @return StampTE $snippet self, chainable 
 	 */
-	public function inject($where, $data, $raw=false) {
+	public function inject($slot, $data, $raw=false) {
 		if (!$raw) $data = $this->filter($data);
-		$where = "#&$where#";
+		$where = "#&$slot#";
+		$whereOpt = "#&$slot?#";
 		$this->template = str_replace($where,$data,$this->template);
+		$this->template = str_replace($whereOpt,$data,$this->template);
 		return $this;
 	}
 	
