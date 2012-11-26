@@ -434,7 +434,11 @@ class StampTE {
 	 * @return string $string 
 	 */
 	protected function filter($data) {
-		return htmlspecialchars($data,ENT_COMPAT,'UTF-8');
+		//First apply HTML special chars
+		$filtered = htmlspecialchars($data,ENT_COMPAT,'UTF-8');
+		//Now apply additional filtering for MSIE backtick XSS hack
+		$filtered = str_replace('`','&#96;',$filtered);
+		return $filtered;
 	}
 	
 	

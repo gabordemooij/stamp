@@ -836,7 +836,17 @@ $s->setSlot('#&Boo#');
 $s->setBoo('Baa');
 asrt(trim($s),'<div>#&amp;Boo#</div>');
 
+testpack('Test backtick XSS filter for MSIE');
 
+$t = '<b id="#slot#"></b>';
+$s = new StampTE($t);
+$s->setSlot('`');
+asrt(trim($s),'<b id="&#96;"></b>');
+
+$t = '<b id="#slot#"></b>';
+$s = new StampTE($t);
+$s->setSlot('``');
+asrt(trim($s),'<b id="&#96;&#96;"></b>');
 
 echo PHP_EOL;
 echo '--- DONE ---';
