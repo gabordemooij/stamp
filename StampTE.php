@@ -268,8 +268,9 @@ class StampTE {
 		$template = $this->template;
 		$template = preg_replace("/<!--\s*(paste):[a-zA-Z0-9\(\),\/]*\s*-->/m","",$template);
     	$template = preg_replace("/\n[\n\t\s]*\n/m","\n",$template);
-		$template = preg_replace("/#\&\w+\?#/m","",$template);
-    	$template = trim($template);
+		$template = preg_replace("/data\-stampte=\"#\&\w+\?#\"/m","",$template);
+    	$template = preg_replace("/#\&\w+\?#/m","",$template);
+		$template = trim($template);
 		return $template;
 	}
 	
@@ -347,6 +348,24 @@ class StampTE {
 		if (!$raw) $data = $this->filter($data);
 		$where = "#&$slot#";
 		$whereOpt = "#&$slot?#";
+		$this->template = str_replace($where,$data,$this->template);
+		$this->template = str_replace($whereOpt,$data,$this->template);
+		return $this;
+	}
+	
+	/**
+	 * Injects a piece of data into an attribute slot marker in the snippet/template.
+	 * 
+	 * @param string  $slot name of the slot where the data should be injected
+	 * @param string  $data the data to be injected in the slot
+	 * @param boolean $raw  if TRUE output will not be escaped
+	 * 
+	 * @return StampTE 
+	 */
+	public function injectAttr($slot, $data, $raw = false) {
+		if (!$raw) $data = $this->filter($data);
+		$where = "data-stampte=\"#&$slot#\"";
+		$whereOpt = "data-stampte=\"#&$slot?#\"";
 		$this->template = str_replace($where,$data,$this->template);
 		$this->template = str_replace($whereOpt,$data,$this->template);
 		return $this;

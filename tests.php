@@ -848,6 +848,32 @@ $s = new StampTE($t);
 $s->setSlot('``');
 asrt(trim($s),'<b id="&#96;&#96;"></b>');
 
+testpack('Test attribute injection');
+
+$t = '<input type="checkbox" data-stampte="#state?#" />';
+$s = new StampTE($t);
+$s->injectAttr('state','checked');
+asrt(trim($s), '<input type="checkbox" checked />');
+
+$t = '<input type="checkbox" data-stampte="#state?#" />';
+$s = new StampTE($t);
+$s->injectAttr('state', '<');
+asrt(trim($s), '<input type="checkbox" &lt; />');
+
+$t = '<input type="checkbox" data-stampte="#state?#" />';
+$s = new StampTE($t);
+$x = $s->injectAttr('state', '<', true);
+asrt(($x instanceof StampTE),true);
+asrt(trim($s), '<input type="checkbox" < />');
+
+$t = '<input type="checkbox" data-stampte="#state?#" />';
+$s = new StampTE($t);
+asrt(trim($s), '<input type="checkbox"  />');
+
+$t = '<input type="checkbox" data-stampte="#state#" />';
+$s = new StampTE($t);
+asrt(trim($s), '<input type="checkbox" data-stampte="#&state#" />');
+
 echo PHP_EOL;
 echo '--- DONE ---';
 echo PHP_EOL;
