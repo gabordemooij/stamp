@@ -536,6 +536,18 @@ class StampTE {
 		$this->factory = $factory;
 	}
 	
+	/**
+	 * Attr is a shortcut to quickly set an attribute.
+	 * 
+	 * @param string  $slot  slot
+	 * @param boolean $onOff whether to fill in the slot or not
+	 * 
+	 * @return StampTE
+	 */
+	public function attr($slot, $onOff = true) {
+		return $this->injectAttr($slot, $slot);
+	}
+	
 }
 
 //Stamp Exception
