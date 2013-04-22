@@ -107,7 +107,7 @@ class StampTE {
 				$me->addToSlots($id);
 				return "#$id#";
 			}
-		},$this->template);
+		}, $this->template);
 		$this->template = preg_replace('/#(\w+)(\?)?#/sU', '#&$1$2#', $this->template);		
 
 	}
@@ -149,7 +149,7 @@ class StampTE {
 	 * @param string $id
 	 * @param string $snippet 
 	 */
-	public function addToSketchBook($id,$snippet) {
+	public function addToSketchBook($id, $snippet) {
 			$this->catalogue[$id] = count($this->sketchBook);
 			$this->sketchBook[] = $snippet;
 	}
@@ -341,7 +341,7 @@ class StampTE {
 	 *
 	 * @return StampTE $snippet self, chainable 
 	 */
-	public function injectRaw($where,$data) {
+	public function injectRaw($where, $data) {
 		return $this->inject($where, $data, true);
 	}
 	/**
@@ -352,7 +352,7 @@ class StampTE {
 	 * 
 	 * @return StampTE self, chainable
 	 */
-	public function injectAll($array,$raw=false) {
+	public function injectAll($array, $raw=false) {
 		foreach($array as $key => $value) {
 			$this->inject($key, $value, $raw);
 		}
@@ -431,7 +431,7 @@ class StampTE {
 	 *				- getX(), routes to get('X')
 	 *				- setX(Y), routes to inject('X',Y)
 	 */
-	public function __call($method,$arguments) {
+	public function __call($method, $arguments) {
 		if (strpos($method, 'get')===0) {
 			return $this->get(lcfirst(substr($method, 3)));
 		} elseif (strpos($method, 'set')===0) {
@@ -452,7 +452,7 @@ class StampTE {
 		if ($this->select === null) {
 			$this->select = 'self'.$stamp->getID();
 		}
-		$this->glue($this->select,$stamp);
+		$this->glue($this->select, $stamp);
 		$this->select = null; //reset
 		return $this;
 	}
