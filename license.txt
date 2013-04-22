@@ -7,7 +7,7 @@ License
 -------
 
 StampTE Template Engine -
-Written by Gabor de Mooij (c) copyright 2012
+Written by Gabor de Mooij (c) copyright 2013
 
 StampTE is DUAL Licensed BSD and GPLv2. You may choose the license that fits
 best for your project.
@@ -38,7 +38,7 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-StampTE is Written by Gabor de Mooij (G.J.G.T de Mooij) Copyright (c) 2011.
+StampTE is Written by Gabor de Mooij (G.J.G.T de Mooij) Copyright (c) 2013.
 
 
 GPLv2 LICENSE
