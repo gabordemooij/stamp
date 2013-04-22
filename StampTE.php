@@ -267,9 +267,9 @@ class StampTE {
 	public function __toString() {
 		$template = $this->template;
 		$template = preg_replace("/<!--\s*(paste):[a-zA-Z0-9\(\),\/]*\s*-->/m","",$template);
-    	$template = preg_replace("/\n[\n\t\s]*\n/m","\n",$template);
+		$template = preg_replace("/\n[\n\t\s]*\n/m","\n",$template);
 		$template = preg_replace("/data\-stampte=\"#\&\w+\?#\"/m","",$template);
-    	$template = preg_replace("/#\&\w+\?#/m","",$template);
+		$template = preg_replace("/#\&\w+\?#/m","",$template);
 		$template = trim($template);
 		return $template;
 	}
