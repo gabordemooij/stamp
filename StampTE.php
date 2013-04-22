@@ -545,7 +545,7 @@ class StampTE {
 	 * @return StampTE
 	 */
 	public function attr($slot, $onOff = true) {
-		return $this->injectAttr($slot, $slot);
+		return ($onOff) ? $this->injectAttr($slot, $slot) : $this;
 	}
 	
 }

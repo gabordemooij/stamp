@@ -878,9 +878,20 @@ testpack('Attr-toggler');
 
 $t = '<input type="checkbox" data-stampte="#checked?#" />';
 $s = new StampTE($t);
-$s->attr('checked',true);
+$x = $s->attr('checked', true);
 asrt(($x instanceof StampTE),true);
 asrt(trim($s), '<input type="checkbox" checked />');
+
+$t = '<input type="checkbox" data-stampte="#checked?#" />';
+$s = new StampTE($t);
+$x = $s->attr('checked', false);
+asrt(($x instanceof StampTE),true);
+asrt(trim($s), '<input type="checkbox"  />');
+
+$t = '<input type="checkbox" data-stampte="#checked?#" />';
+$s = new StampTE($t);
+asrt(trim($s), '<input type="checkbox"  />');
+
 
 echo PHP_EOL;
 echo '--- DONE ---';
