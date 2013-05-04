@@ -265,21 +265,15 @@ class StampTE {
 	public function glue($what, $snippet) {
 		$matches=array();
 		$pattern = '/<!\-\-\spaste:'.$what.'(\(([a-zA-Z0-9,]+)\))?\s\-\->/';
-		if (preg_match($pattern, $this->template, $matches)) {
-			if (isset($matches[0])) {
-				$copyOrig = $matches[0];
-				if (isset($matches[2])) {
-					$allowedSnippets = $matches[2];
-					$allowedMap = array_flip(explode(',', $allowedSnippets));
-					if (!isset($allowedMap[$snippet->getID()])) {
-						throw new StampTEException('Snippet '.$snippet->getID().' not allowed in slot '.$what);
-					}
-				}
-				$this->template = preg_replace_callback($pattern, function() use ($snippet, $copyOrig) {
-					return $snippet.$copyOrig;
-				}, $this->template);
+		$this->template = preg_replace_callback($pattern, function($matches) use ($snippet) {
+			$copyOrig = $matches[0];
+			if (isset($matches[2])) {
+				$allowedSnippets = $matches[2];
+				$allowedMap = array_flip(explode(',', $allowedSnippets));
+				if (!isset($allowedMap[$snippet->getID()])) throw new StampTEException('Snippet '.$snippet->getID().' not allowed in slot '.$what);
 			}
-		}
+			return $snippet.$copyOrig;	
+		}, $this->template);
 		return $this;
 	}
 	/**
