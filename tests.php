@@ -892,6 +892,16 @@ $t = '<input type="checkbox" data-stampte="#checked?#" />';
 $s = new StampTE($t);
 asrt(trim($s), '<input type="checkbox"  />');
 
+testpack('Test escaping issue');
+
+$s = new StampTE('<!-- cut:item -->#slot#<!-- /cut:item -->');
+$s->add($s->getItem()->setSlot('/'));
+asrt(trim($s),'/');
+
+
+$s = new StampTE('<!-- cut:item -->#slot#<!-- /cut:item -->');
+$s->add($s->getItem()->setSlot('$1'));
+asrt(trim($s),'$1');
 
 echo PHP_EOL;
 echo '--- DONE ---';

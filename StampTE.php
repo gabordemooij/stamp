@@ -275,7 +275,9 @@ class StampTE {
 						throw new StampTEException('Snippet '.$snippet->getID().' not allowed in slot '.$what);
 					}
 				}
-				$this->template = preg_replace($pattern, $snippet.$copyOrig, $this->template);
+				$this->template = preg_replace_callback($pattern, function() use ($snippet, $copyOrig) {
+					return $snippet.$copyOrig;
+				}, $this->template);
 			}
 		}
 		return $this;
