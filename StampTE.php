@@ -91,7 +91,7 @@ class StampTE {
 	* Clean flag
 	* @var boolean
 	*/
-	private static $cleanWS = true;
+	private static $cleanWS = false;
 	
 	public static function setWSCleanMode($yesNo) {
 		self::$cleanWS = $yesNo;

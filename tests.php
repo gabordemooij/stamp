@@ -33,6 +33,7 @@ function testpack($name) { printtext("\ntesting: ".$name); }
  * The real testing stuff
  */
 require('StampTE.php');
+StampTE::setWSCleanMode(true);
 testpack("Basics");
 
 $template = '<message>#greet#</message>';
