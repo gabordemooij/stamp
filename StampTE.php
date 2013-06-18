@@ -249,12 +249,14 @@ class StampTE {
 	public function __toString() {
 		$template = $this->template;
 		$template = preg_replace("/<!--\s*(paste):[a-zA-Z0-9\(\),\/]*\s*-->/m", "", $template);
-		if (self::$cleanWS) $template = preg_replace("/\n[\n\t\s]*\n/m", "\n", $template);
 		if (strpos($template,'#&')!==false) {
 			$template = preg_replace("/data\-stampte=\"#\&\w+\?#\"/m", "", $template);
 			$template = preg_replace("/#\&\w+\?#/m", "", $template);
 		}
-		$template = trim($template);
+		if (self::$cleanWS) { 
+			$template = preg_replace("/\n[\n\t\s]*\n/m", "\n", $template);
+			$template = trim($template);
+		}
 		return $template;
 	}
 	/**
