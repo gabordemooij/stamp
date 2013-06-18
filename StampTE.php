@@ -88,6 +88,16 @@ class StampTE {
 	 */
 	protected $factory = null;
 	/**
+	* Clean flag
+	* @var boolean
+	*/
+	private static $cleanWS = true;
+	
+	public static function setWSCleanMode($yesNo) {
+		self::$cleanWS = $yesNo;
+	}
+
+	/**
 	 * Constructor. Pass nothing if you plan to use cache.
 	 * 
 	 * @param string $tpl HTML Template
@@ -239,9 +249,11 @@ class StampTE {
 	public function __toString() {
 		$template = $this->template;
 		$template = preg_replace("/<!--\s*(paste):[a-zA-Z0-9\(\),\/]*\s*-->/m", "", $template);
-		$template = preg_replace("/\n[\n\t\s]*\n/m", "\n", $template);
-		$template = preg_replace("/data\-stampte=\"#\&\w+\?#\"/m", "", $template);
-		$template = preg_replace("/#\&\w+\?#/m", "", $template);
+		if (self::$cleanWS) $template = preg_replace("/\n[\n\t\s]*\n/m", "\n", $template);
+		if (strpos($template,'#&')!==false) {
+			$template = preg_replace("/data\-stampte=\"#\&\w+\?#\"/m", "", $template);
+			$template = preg_replace("/#\&\w+\?#/m", "", $template);
+		}
 		$template = trim($template);
 		return $template;
 	}
@@ -265,7 +277,7 @@ class StampTE {
 	public function glue($what, $snippet) {
 		$matches=array();
 		$pattern = '/<!\-\-\spaste:'.$what.'(\(([a-zA-Z0-9,]+)\))?\s\-\->/';
-		$this->template = preg_replace_callback($pattern, function($matches) use ($snippet) {
+		$this->template = preg_replace_callback($pattern, function($matches) use ($snippet, $what) {
 			$copyOrig = $matches[0];
 			if (isset($matches[2])) {
 				$allowedSnippets = $matches[2];

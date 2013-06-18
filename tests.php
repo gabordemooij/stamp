@@ -72,6 +72,10 @@ $StampTE = new StampTE($template);
 asrt("HELLO
 WORLD",trim($StampTE));
 
+StampTE::setWSCleanMode(false);
+asrt($template,trim($StampTE));
+StampTE::setWSCleanMode(true);
+
 testpack("Test Cut and Paste Metaphor");
 $template = "
 	<box>
