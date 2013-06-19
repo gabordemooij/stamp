@@ -33,7 +33,6 @@ function testpack($name) { printtext("\ntesting: ".$name); }
  * The real testing stuff
  */
 require('StampTE.php');
-StampTE::setWSCleanMode(true);
 testpack("Basics");
 
 $template = '<message>#greet#</message>';
@@ -44,6 +43,7 @@ asrt('<message>&lt;HELLO&gt;</message>',$s->__toString());
 //does the StampTETE class exist?
 if (class_exists('StampTE')) pass();
 
+testpack('Test Whitespace handling');
 //Can we succesfully create an instance of the StampTETE class?
 $StampTE = new StampTE('');
 
@@ -71,11 +71,242 @@ $template = "HELLO
 WORLD";
 $StampTE = new StampTE($template);
 asrt("HELLO
-WORLD",trim($StampTE));
 
-StampTE::setWSCleanMode(false);
+
+
+WORLD",trim($StampTE));
 asrt($template,trim($StampTE));
-StampTE::setWSCleanMode(true);
+
+//test whitespace
+$template ="<div>
+	<!-- cut:region -->
+	<div>region</div>
+	<!-- /cut:region -->
+	<!-- paste:regions -->
+</div>";
+
+$expect = "<div>
+</div>";
+
+$stampTE = new StampTE($template);
+asrt((string)$stampTE, $expect);
+
+
+$template ="<div>
+	<!-- cut:region -->
+	<div>region</div>
+	<!-- /cut:region -->
+	<!-- paste:regions -->
+</div>";
+
+$expect = "<div>
+	<div>region</div>
+</div>";
+
+$stampTE = new StampTE($template);
+$stampTE->add($stampTE->getRegion());
+asrt((string)$stampTE, $expect);
+
+$template ="<div>
+	<!-- cut:region -->
+	<div>region</div>
+	<!-- /cut:region -->
+	<!-- paste:regions -->
+</div>";
+
+$expect = "<div>
+	<div>region</div>
+</div>";
+
+$stampTE = new StampTE($template);
+$stampTE->regions->add($stampTE->getRegion());
+asrt((string)$stampTE, $expect);
+
+$template ="<div>
+	<!-- cut:region -->
+	<div>region</div>
+	<!-- /cut:region -->
+	<!-- paste:regions -->
+	<!-- paste:regions1 -->
+	<!-- paste:regions2 -->
+	<!-- cut:regionx -->
+	<div>region</div>
+	<!-- /cut:regionx -->
+	<!-- paste:regions3 -->
+</div>";
+
+$expect = "<div>
+	<div>region</div>
+</div>";
+
+$stampTE = new StampTE($template);
+$stampTE->add($stampTE->getRegion());
+asrt((string)$stampTE, $expect);
+
+
+$template ="<div>
+	<!-- cut:region -->
+	<div>|#value#|</div>
+	<!-- /cut:region -->
+	<!-- paste:regions -->
+</div>";
+
+$expect = "<div>
+	<div>|lorem ipsum|</div>
+</div>";
+
+$stampTE = new StampTE($template);
+$stampTE->regions->add($stampTE->getRegion()->setValue('lorem ipsum'));
+asrt((string)$stampTE, $expect);
+
+$template ="<div>
+	<!-- cut:region -->
+	<div>| 
+	#value#|</div>
+	<!-- /cut:region -->
+	<!-- paste:regions -->
+</div>";
+
+$expect = "<div>
+	<div>| 
+	lorem ipsum|</div>
+</div>";
+
+$stampTE = new StampTE($template);
+$stampTE->regions->add($stampTE->getRegion()->setValue('lorem ipsum'));
+asrt((string)$stampTE, $expect);
+
+
+$template ="<div>
+	<!-- cut:region -->
+	<div>|<!-- slot:value --><!-- /slot:value -->|</div>
+	<!-- /cut:region -->
+	<!-- paste:regions -->
+</div>";
+
+$expect = "<div>
+	<div>|lorem ipsum|</div>
+</div>";
+
+$stampTE = new StampTE($template);
+$stampTE->regions->add($stampTE->getRegion()->setValue('lorem ipsum'));
+asrt((string)$stampTE, $expect);
+
+
+$template ="<div>
+	<!-- cut:region -->
+	<div>|<!-- slot:value -->DEMO<!-- /slot:value -->|</div>
+	<!-- /cut:region -->
+	<!-- paste:regions -->
+</div>";
+
+$expect = "<div>
+	<div>|lorem ipsum|</div>
+</div>";
+
+$stampTE = new StampTE($template);
+$stampTE->regions->add($stampTE->getRegion()->setValue('lorem ipsum'));
+asrt((string)$stampTE, $expect);
+
+
+$template ="<div>
+	<!-- cut:region -->
+	<div>|#value?#|</div>
+	<!-- /cut:region -->
+	<!-- paste:regions -->
+</div>";
+
+$expect = "<div>
+	<div>|lorem ipsum|</div>
+</div>";
+
+$stampTE = new StampTE($template);
+$stampTE->regions->add($stampTE->getRegion()->setValue('lorem ipsum'));
+asrt((string)$stampTE, $expect);
+
+
+$template ="<div>
+	<!-- cut:region -->
+	<div>|#value?#|</div>
+	<!-- /cut:region -->
+	<!-- paste:regions -->
+	<!-- paste:regions2(france,germany) -->
+</div>";
+
+$expect = "<div>
+	<div>||</div>
+</div>";
+
+$stampTE = new StampTE($template);
+$stampTE->regions->add($stampTE->getRegion());
+asrt((string)$stampTE, $expect);
+
+
+$template ="<div>
+	<!-- cut:region -->
+
+	<div>region </div>
+	<!-- /cut:region -->
+	<!-- paste:regions -->
+</div>";
+
+$expect = "<div>
+
+	<div>region </div>
+</div>";
+
+$stampTE = new StampTE($template);
+$stampTE->regions->add($stampTE->getRegion());
+asrt((string)$stampTE, $expect);
+
+
+testpack('UTF8 Tests');
+
+$template ="<div>
+	<!-- cut:region -->
+	<div>象形字</div>
+	<!-- /cut:region -->
+	<!-- paste:regions -->
+</div>";
+
+$expect = "<div>
+	<div>象形字</div>
+</div>";
+
+$stampTE = new StampTE($template);
+$stampTE->regions->add($stampTE->getRegion());
+asrt((string)$stampTE, $expect);
+
+
+$template ="<div>
+	<!-- cut:region -->
+	<div>#value#</div>
+	<!-- /cut:region -->
+	<!-- paste:regions -->
+</div>";
+
+$expect = "<div>
+	<div>象形字</div>
+</div>";
+
+$stampTE = new StampTE($template);
+$stampTE->regions->add($stampTE->getRegion()->setValue('象形字'));
+asrt((string)$stampTE, $expect);
+
+$template ="<div>象形字
+	<!-- cut:region -->
+	<div>象形字#value#</div>
+	<!-- /cut:region -->
+	<!-- paste:regions -->
+</div>";
+
+$expect = "<div>象形字
+	<div>象形字象形字</div>
+</div>";
+
+$stampTE = new StampTE($template);
+$stampTE->regions->add($stampTE->getRegion()->setValue('象形字'));
+asrt((string)$stampTE, $expect);
 
 testpack("Test Cut and Paste Metaphor");
 $template = "
@@ -510,7 +741,7 @@ $StampTE = new StampTE($template);
 asrt(strval($StampTE),'<!-- cut:hello -->hello there');
 	
 $StampTE = new StampTE('<!-- cut:hello ');
-asrt(strval($StampTE),'<!-- cut:hello');
+asrt(strval($StampTE),'<!-- cut:hello ');
 
 testpack('Wrong regions');
 $StampTE = new StampTE('data<!-- cut:and logic');
@@ -542,14 +773,16 @@ $stampTE = new StampTE('
 	<!-- /cut:todo -->
 </ul>
 ');
+//echo $stampTE->getTodo();exit;
 $todoItem = $stampTE->get('todo');
 $todoItem->inject('todo','Make Coffee');
 $stampTE->add($todoItem);
-$expectation = '
-<ul>
+$expectation = '<ul>
 	<li>Make Coffee</li>
 </ul>
 ';
+
+
 asrt(trim(strval($stampTE)),trim($expectation));
 
 //Now with two lists
@@ -566,8 +799,7 @@ $stampTE = new StampTE('
 $todoItem = $stampTE->get('todo');
 $todoItem->inject('todo','Make Coffee');
 $stampTE->add($todoItem);
-$expectation = '
-<ul>
+$expectation = '<ul>
 	<li>Make Coffee</li>
 </ul>
 ';

@@ -87,15 +87,6 @@ class StampTE {
 	 * @var closure 
 	 */
 	protected $factory = null;
-	/**
-	* Clean flag
-	* @var boolean
-	*/
-	private static $cleanWS = false;
-	
-	public static function setWSCleanMode($yesNo) {
-		self::$cleanWS = $yesNo;
-	}
 
 	/**
 	 * Constructor. Pass nothing if you plan to use cache.
@@ -107,7 +98,7 @@ class StampTE {
 		$this->id = $id;
 		$this->template = $tpl;
 		$this->matches = array();
-		$pattern = '/<!\-\-\s(cut|slot):(\w+)\s\-\->(.*)?<!\-\-\s\/(cut|slot):\2\s\-\->/sU';
+		$pattern = '/\s*<!\-\-\s(cut|slot):(\w+)\s\-\->(.*)?<!\-\-\s\/(cut|slot):\2\s\-\->/sU';
 		$me = $this;
 		$this->template = preg_replace_callback($pattern, function($matches)use($me){
 			list(, $type, $id, $snippet) = $matches;
@@ -248,14 +239,10 @@ class StampTE {
 	 */
 	public function __toString() {
 		$template = $this->template;
-		$template = preg_replace("/<!--\s*(paste):[a-zA-Z0-9\(\),\/]*\s*-->/m", "", $template);
+		$template = preg_replace("/\s*<!--\s*(paste):[a-zA-Z0-9\(\),\/]*\s*-->/m", "", $template);
 		if (strpos($template,'#&')!==false) {
 			$template = preg_replace("/data\-stampte=\"#\&\w+\?#\"/m", "", $template);
 			$template = preg_replace("/#\&\w+\?#/m", "", $template);
-		}
-		if (self::$cleanWS) { 
-			$template = preg_replace("/\n[\n\t\s]*\n/m", "\n", $template);
-			$template = trim($template);
 		}
 		return $template;
 	}
@@ -278,7 +265,7 @@ class StampTE {
 	 */
 	public function glue($what, $snippet) {
 		$matches=array();
-		$pattern = '/<!\-\-\spaste:'.$what.'(\(([a-zA-Z0-9,]+)\))?\s\-\->/';
+		$pattern = '/\s*<!\-\-\spaste:'.$what.'(\(([a-zA-Z0-9,]+)\))?\s\-\->/';
 		$this->template = preg_replace_callback($pattern, function($matches) use ($snippet, $what) {
 			$copyOrig = $matches[0];
 			if (isset($matches[2])) {
