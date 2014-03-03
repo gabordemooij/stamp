@@ -475,7 +475,7 @@ class StampTE
 	protected function filter( $data )
 	{
 		//First apply HTML special chars
-		$filtered = htmlspecialchars( $data, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8' );
+		$filtered = htmlspecialchars( $data, ENT_QUOTES, 'UTF-8' );
 		//Now apply additional filtering for MSIE backtick XSS hack
 		$filtered = str_replace( '`', '&#96;', $filtered );
 
