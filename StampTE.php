@@ -439,10 +439,13 @@ class StampTE
 	 * Collects a list, just like collect() but stores result in cache array.
 	 * 
 	 * @param string $list Pipe separated list of IDs. 
+	 * 
+	 * @return self
 	 */
 	public function writeToCache( $list ) 
 	{
 		$this->cache[$list] = $this->collect( $list );
+		return $this;
 	}
 
 	/**
@@ -458,11 +461,14 @@ class StampTE
 	/**
 	 * Loads cache data.
 	 * 
-	 * @param string $rawCacheData the serialized cached string as retrieved from getCache(). 
+	 * @param string $rawCacheData the serialized cached string as retrieved from getCache().
+	 * 
+	 * @return self 
 	 */
 	public function loadIntoCache( $rawCacheData )
 	{
 		$this->cache = unserialize( $rawCacheData );
+		return $this;
 	}
 
 	/**
@@ -491,7 +497,8 @@ class StampTE
 	 * 
 	 * @return StampTE 
 	 */
-	public function &__get( $gluePoint ) {
+	public function &__get( $gluePoint )
+	{
 		$this->select = $gluePoint;
 		return $this;
 	}

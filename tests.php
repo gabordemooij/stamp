@@ -1,5 +1,7 @@
 <?php
 
+xdebug_start_code_coverage( XDEBUG_CC_UNUSED | XDEBUG_CC_DEAD_CODE );
+
 /**
  * Basic testing functions
  */
@@ -433,6 +435,15 @@ $expectation = "
 		<fish color='yellow'></fish>
 	</bowl>
 ";
+
+asrt(clean($StampTE),clean($expectation));
+
+//now with glueAll, to do it all in one run...
+$StampTE = new StampTE($template);
+$redfish = $StampTE->get("redfish");
+$yellowfish = $StampTE->get("yellowfish");
+$StampTE->glueAll(array('bowl1'=>$redfish,'bowl2'=>$yellowfish));
+
 
 asrt(clean($StampTE),clean($expectation));
 
@@ -1139,6 +1150,122 @@ asrt(trim($s),'/');
 $s = new StampTE('<!-- cut:item -->#slot#<!-- /cut:item -->');
 $s->add($s->getItem()->setSlot('$1'));
 asrt(trim($s),'$1');
+
+//Test cache & collect
+testpack('Test Cache and Collect');
+
+$s = new StampTE('
+<div>
+<!-- cut:textfield --><input type="text" /><!-- /cut:textfield -->
+<!-- cut:button --><button>OK</button><!-- /cut:button -->
+</div>
+<form>
+<!-- paste:form(button,textfield) -->
+</form>
+');
+
+$cacheObject = $s->writeToCache('button|textfield')->getCache();
+
+//make sure cache is used, remove elements from new template...
+$s = new StampTE('
+<div>
+</div>
+<form>
+<!-- paste:form(button,textfield) -->
+</form>
+');
+
+$s->loadIntoCache($cacheObject);
+$items = $s->collect('button|textfield');
+asrt(count($items), 2);
+
+try {
+	$s->collect('button|textfield|misc');
+	fail();
+} catch(Exception $e) {
+	pass();
+}
+
+$button = $items[0];
+$textField = $items[1];
+
+$s->form->add($button->copy());
+$s->form->add($textField->copy());
+
+asrt(trim('<div>
+</div>
+<form><button>OK</button><input type="text" />
+</form>
+'),trim(strval($s)));
+
+
+//Test template loader
+testpack('Test Template Loader');
+
+$path = '/tmp/dummy.tpl';
+$template = '<div>
+<!-- cut:message -->Dummy Template for StampTE Unit Test<!-- /cut:message -->
+</div>';
+file_put_contents($path, $template);
+$s = StampTE::load($path);
+
+asrt(strval($s->getMessage()), 'Dummy Template for StampTE Unit Test');
+asrt($s->getString(), '<div><!-- paste:selfmessage -->
+</div>');
+
+try {
+	StampTE::load('/non/existant/file/nowhere.nothing');
+	fail();
+} catch(Exception $e) {
+	pass();
+}
+
+$report = xdebug_get_code_coverage();
+$misses = 0;
+$hits = 0;
+
+$covLines = array();
+foreach( $report as $file => $lines ) {
+	$pi = pathinfo( $file );
+	
+	if ( strpos( $file, 'Stamp' ) === false ) continue;
+	$covLines[] = '***** File:'.$file.' ******';
+	
+	$fileData = file_get_contents( $file );
+	$fileLines = explode( "\n", $fileData );
+	$i = 1;
+	foreach( $fileLines as $covLine ) {
+		if ( isset( $lines [$i] ) ) {
+			if ( $lines[$i] === 1 ) {
+				$covLines[] = '[ OK      ] '.$covLine;
+				$hits ++;
+			} else if ( $lines[$i] === -1 ){
+				$covLines[] = '[ MISSED! ] '.$covLine;
+				$misses ++;
+			} else {
+				$covLines[] = '[ -       ] '.$covLine;
+			}
+		} else {
+			$covLines[] = '[ -       ] '.$covLine;
+		}
+		$i ++;
+	}
+}
+$covFile = implode( "\n", $covLines );
+@file_put_contents( 'coverage_log.txt', $covFile );
+
+if ( $hits > 0 ) {
+	$perc = ( $hits / ( $hits + $misses ) ) * 100;
+} else {
+	$perc = 0;
+}
+
+echo 'Code Coverage: '.PHP_EOL;
+echo 'Hits: '.$hits.PHP_EOL;
+echo 'Misses: '.$misses.PHP_EOL;
+echo 'Percentage: '.$perc.' %'.PHP_EOL;
+exit( 0 );
+
 
 echo PHP_EOL;
 echo '--- DONE ---';
