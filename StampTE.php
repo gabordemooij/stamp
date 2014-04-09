@@ -16,7 +16,7 @@
  *  Stamp t.e.
  *  The Beautiful Template Engine
  *  @author Gabor de Mooij
- *  @version 2.1.5
+ *  @version 2.2
  *  @copyright 2013
  *  @license New BSD License
  *  ---------------------------------------------------------------------------
