@@ -580,4 +580,4 @@ class StampTE
 	}
 }
 //Stamp Exception
-class StampTEException extends \InvalidArgumentException {}
+class StampTEException extends Exception {}

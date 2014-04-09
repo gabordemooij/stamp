@@ -1018,6 +1018,18 @@ asrt(strval($stampTE),'Hi');
 testpack('Security Test');
 $t = '<input type="#type#" value="#value#">';
 $s = new StampTE($t);
+$s->setValue('"');
+$s->setType('text');
+asrt(trim($s),'<input type="text" value="&quot;">');
+
+$t = '<input type="#type#" value="#value#">';
+$s = new StampTE($t);
+$s->setValue("'");
+$s->setType('text');
+asrt(trim($s),'<input type="text" value="&#039;">');
+
+$t = '<input type="#type#" value="#value#">';
+$s = new StampTE($t);
 $s->setValue('#&type#');
 $s->setType('text');
 asrt(trim($s),'<input type="text" value="#&amp;type#">');
@@ -1260,6 +1272,7 @@ if ( $hits > 0 ) {
 	$perc = 0;
 }
 
+echo PHP_EOL;
 echo 'Code Coverage: '.PHP_EOL;
 echo 'Hits: '.$hits.PHP_EOL;
 echo 'Misses: '.$misses.PHP_EOL;
