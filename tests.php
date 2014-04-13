@@ -1272,6 +1272,154 @@ if ( $hits > 0 ) {
 	$perc = 0;
 }
 
+//test exceptions
+testpack('Test exceptions');
+
+try {
+	StampTE::load( '/non/existant/file/nowhere.nothing' );
+	fail();
+} catch( StampTEException $e ) {
+	asrt( strpos( $e->getMessage(), '[S001]' ) === 0, TRUE );
+}
+
+
+//Null is allowed, becomes empty string ''.
+$s = new StampTE( NULL );
+pass();
+
+try {
+	$s = new StampTE( 123 );
+	fail();
+} catch( StampTEException $e ) {
+	asrt( strpos( $e->getMessage(), '[S002]' ) === 0, TRUE );
+}
+
+
+try {
+	$s = new StampTE( FALSE );
+	fail();
+} catch( StampTEException $e ) {
+	asrt( strpos( $e->getMessage(), '[S002]' ) === 0, TRUE );
+}
+
+
+try {
+	$s = new StampTE( TRUE );
+	fail();
+} catch( StampTEException $e ) {
+	asrt( strpos( $e->getMessage(), '[S002]' ) === 0, TRUE );
+}
+
+
+try {
+	$s = new StampTE( new StdClass );
+	fail();
+} catch( StampTEException $e ) {
+	asrt( strpos( $e->getMessage(), '[S002]' ) === 0, TRUE );
+}
+
+
+try {
+	$s = new StampTE( array() );
+	fail();
+} catch( StampTEException $e ) {
+	asrt( strpos( $e->getMessage(), '[S002]' ) === 0, TRUE );
+}
+
+try {
+	$s = new StampTE( '' );
+	$s->getGhost();
+	fail();
+} catch( StampTEException $e ) {
+	asrt( strpos( $e->getMessage(), '[S101]' ) === 0, TRUE );
+}
+
+try {
+	$s = new StampTE( '' );
+	$s->get('test');
+	fail();
+} catch( StampTEException $e ) {
+	asrt( strpos( $e->getMessage(), '[S101]' ) === 0, TRUE );
+}
+
+try {
+	$s = new StampTE( '' );
+	$s->get('test.test');
+	fail();
+} catch( StampTEException $e ) {
+	asrt( strpos( $e->getMessage(), '[S101]' ) === 0, TRUE );
+}
+
+try {
+	$s = new StampTE( '' );
+	$s->loadIntoCache( NULL );
+	fail();
+} catch( StampTEException $e ) {
+	asrt( strpos( $e->getMessage(), '[S004]' ) === 0, TRUE );
+}
+
+try {
+	$s = new StampTE( '' );
+	$s->setTranslator( NULL );
+	fail();
+} catch( StampTEException $e ) {
+	asrt( strpos( $e->getMessage(), '[S005]' ) === 0, TRUE );
+}
+
+try {
+	$s = new StampTE( '' );
+	$s->setTranslator( 'translator' );
+	fail();
+} catch( StampTEException $e ) {
+	asrt( strpos( $e->getMessage(), '[S005]' ) === 0, TRUE );
+}
+
+
+try {
+	$s = new StampTE( '' );
+	$s->setFactory( NULL );
+	fail();
+} catch( StampTEException $e ) {
+	asrt( strpos( $e->getMessage(), '[S006]' ) === 0, TRUE );
+}
+
+try {
+	$s = new StampTE( '' );
+	$s->setFactory( 'factory' );
+	fail();
+} catch( StampTEException $e ) {
+	asrt( strpos( $e->getMessage(), '[S006]' ) === 0, TRUE );
+}
+
+try {
+	$s = new StampTE( '' );
+	$s->setFactory( 'factory' );
+	fail();
+} catch( StampTEException $e ) {
+	asrt( strpos( $e->getMessage(), '[S006]' ) === 0, TRUE );
+}
+
+try {
+	$s = new StampTE( '<b><!-- paste:here(c) --></b>' );
+	$s->glue( 'here', new StampTE );
+	fail();
+} catch( StampTEException $e ) {
+	asrt( strpos( $e->getMessage(), '[S102]' ) === 0, TRUE );
+}
+
+try {
+	$s = new StampTE( '<b><!-- paste:here(c) --></b>' );
+	$s->glue( 'here', 'x' );
+	fail();
+} catch( StampTEException $e ) {
+	asrt( strpos( $e->getMessage(), '[S003]' ) === 0, TRUE );
+}
+
+//fake possible.
+$s = new StampTE( '<b><!-- paste:here(c) --></b>' );
+$s->here->add( new StampTE('', 'c') );
+pass();
+
 echo PHP_EOL;
 echo 'Code Coverage: '.PHP_EOL;
 echo 'Hits: '.$hits.PHP_EOL;

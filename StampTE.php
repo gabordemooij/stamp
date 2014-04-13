@@ -105,7 +105,11 @@ class StampTE
 	 */
 	public function __construct( $tpl='', $id='root' )
 	{
-		$this->id       = $id;
+		if ( is_null( $tpl ) ) $tpl = '';
+		
+		if ( !is_string( $tpl ) ) throw new StampTEException( '[S002] Template parameter in constructor must be of type STRING.' );
+		
+		$this->id       = strval( $id );
 		$this->template = $tpl;
 		$this->matches  = array();
 		$pattern        = '/\s*<!\-\-\s(cut|slot):(\w+)\s\-\->(.*)?<!\-\-\s\/(cut|slot):\2\s\-\->/sU';
@@ -183,7 +187,7 @@ class StampTE
 	 */
 	public static function load( $filename )
 	{
-		if ( !file_exists( $filename ) ) throw new StampTEException( 'Could not find file: '.$filename );
+		if ( !file_exists( $filename ) ) throw new StampTEException( '[S001] Could not find file: '.$filename );
 		$template = file_get_contents( $filename );
 		return new static( $template );
 	}
@@ -234,7 +238,7 @@ class StampTE
 				return $new;
 			}
 		} else {
-			throw new StampTEException( 'Cannot find Stamp Snippet with ID '.preg_replace( '/\W/', '', $id ) );
+			throw new StampTEException( '[S101] Cannot find Stamp Snippet with ID '.preg_replace( '/\W/', '', $id ) );
 		}
 	}
 
@@ -308,9 +312,12 @@ class StampTE
 			$copyOrig = $matches[0];
 	
 			if ( isset($matches[2]) ) {
+				
+				if ( !is_object( $snippet ) ) throw new StampTEException('[S003] Snippet is not an object or string.');
+
 				$allowedSnippets = $matches[2];
 				$allowedMap      = array_flip( explode( ',', $allowedSnippets ) );
-				if ( !isset( $allowedMap[$snippet->getID()] ) ) throw new StampTEException( 'Snippet '.$snippet->getID().' not allowed in slot '.$what );
+				if ( !isset( $allowedMap[$snippet->getID()] ) ) throw new StampTEException( '[S102] Snippet '.$snippet->getID().' not allowed in slot '.$what );
 			}
 
 			return $snippet.$copyOrig;
@@ -468,6 +475,9 @@ class StampTE
 	public function loadIntoCache( $rawCacheData )
 	{
 		$this->cache = unserialize( $rawCacheData );
+		
+		if ( !is_array( $this->cache ) ) throw new StampTEException( '[S004] Failed to unserialize cache object.' );
+		
 		return $this;
 	}
 
@@ -551,6 +561,8 @@ class StampTE
 	 */
 	public function setTranslator( $closure )
 	{
+		if ( !is_callable( $closure ) ) throw new StampTEException('[S005] Invalid Translator.');
+		
 		$this->translator = $closure;
 	}
 
@@ -563,6 +575,8 @@ class StampTE
 	 */
 	public function setFactory( $factory )
 	{
+		if ( !is_callable( $factory ) ) throw new StampTEException('[S006] Invalid Factory.');
+		
 		$this->factory = $factory;
 	}
 
