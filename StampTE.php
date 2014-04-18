@@ -24,6 +24,12 @@
 class StampTE 
 {
 	/**
+	 * HTML5 Document template cache.
+	 * @var string
+	 */
+	private static $html5Tpl = null;
+
+	/**
 	 * Holds the template
 	 * @var string
 	 */
@@ -96,6 +102,45 @@ class StampTE
 	 * @var closure 
 	 */
 	protected $factory = null;
+
+	/**
+	 * Returns a StampTE template configured with a proper
+	 * HTML 5 document using UTF-8 correct encoding (secure with 
+	 * default XSS escaping features).
+	 * 
+	 * This default template contains two cut markers: link and script,
+	 * two glue points: head and body and one slot: title.
+	 * 
+	 * Usage example:
+	 * 
+	 * $tpl = StampTE::createHtml5Utf8Document();
+	 * $tpl->setTitle('Welcome to StampTE'); //set the title.
+	 * $tpl->head->add( $linkTag ); //Add stylesheets and scripts!
+	 * $tpl->body->add( $myDocument ); //Add your body content!
+	 * 
+	 * @return StampTE template
+	 */
+	public static function createHtml5Utf8Document()
+	{
+		if (is_null(self::$html5Tpl)) {
+			$template = '';
+			$template .= "<!DOCTYPE html>\n";
+			$template .= "<html>\n";
+			$template .= "<head>\n";
+			$template .= "<meta charset=\"UTF-8\">\n";
+			$template .= "<title>#title?#</title>\n";
+			$template .= "<!-- cut:link --><link data-stampte=\"#linkAttributes?#\" rel=\"#rel?#\" type=\"#type?#\" href=\"#href?#\" ><!-- /cut:link -->\n";
+			$template .= "<!-- cut:script --><script data-stampte=\"#scriptAttributes?#\" src=\"#src?#\" ></script><!-- /cut:script -->\n";
+			$template .= "<!-- paste:head -->";
+			$template .= "</head>\n";
+			$template .= "<body data-stampte=\"#bodyAttributes?#\">";
+			$template .= "<!-- paste:body -->";
+			$template .= "</body>\n";
+			$template .= "</html>";
+			self::$html5Tpl = $template;
+		}
+		return new self( self::$html5Tpl );
+	}
 
 	/**
 	 * Constructor. Pass nothing if you plan to use cache.
@@ -496,9 +541,9 @@ class StampTE
 	{
 		//First apply HTML special chars
 		$filtered = htmlspecialchars( $data, ENT_QUOTES, 'UTF-8' );
-		//Now apply additional filtering for MSIE backtick XSS hack
-		$filtered = str_replace( '`', '&#96;', $filtered );
 
+		$filtered = str_replace( '`', '&#96;', $filtered ); //Prevent MSIE backtick XSS hack
+		
 		return $filtered;
 	}
 

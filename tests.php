@@ -1232,46 +1232,6 @@ try {
 	pass();
 }
 
-$report = xdebug_get_code_coverage();
-$misses = 0;
-$hits = 0;
-
-$covLines = array();
-foreach( $report as $file => $lines ) {
-	$pi = pathinfo( $file );
-	
-	if ( strpos( $file, 'Stamp' ) === false ) continue;
-	$covLines[] = '***** File:'.$file.' ******';
-	
-	$fileData = file_get_contents( $file );
-	$fileLines = explode( "\n", $fileData );
-	$i = 1;
-	foreach( $fileLines as $covLine ) {
-		if ( isset( $lines [$i] ) ) {
-			if ( $lines[$i] === 1 ) {
-				$covLines[] = '[ OK      ] '.$covLine;
-				$hits ++;
-			} else if ( $lines[$i] === -1 ){
-				$covLines[] = '[ MISSED! ] '.$covLine;
-				$misses ++;
-			} else {
-				$covLines[] = '[ -       ] '.$covLine;
-			}
-		} else {
-			$covLines[] = '[ -       ] '.$covLine;
-		}
-		$i ++;
-	}
-}
-$covFile = implode( "\n", $covLines );
-@file_put_contents( 'coverage_log.txt', $covFile );
-
-if ( $hits > 0 ) {
-	$perc = ( $hits / ( $hits + $misses ) ) * 100;
-} else {
-	$perc = 0;
-}
-
 //test exceptions
 testpack('Test exceptions');
 
@@ -1405,6 +1365,86 @@ try {
 $s = new StampTE( '<b><!-- paste:here(c) --></b>' );
 $s->here->add( new StampTE('', 'c') );
 pass();
+
+//test html5 document creator
+testpack('Test HTML5 document creator.');
+$tpl = StampTE::createHtml5Utf8Document();
+
+$expectedHTML = '<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title></title></head>
+<body ></body>
+</html>';
+asrt(strval($tpl), $expectedHTML);
+
+$tpl->setTitle('Welcome to StampTE');
+$tpl->add($tpl
+        ->getLink()
+        ->copy()
+        ->setRel('stylesheet')
+        ->setType('text/css')
+        ->setHref('style.css'));
+$tpl->add($tpl
+        ->getScript()
+        ->copy()
+        ->setSrc('js/script.js'));
+$myTemplateStr = '<span>#greeting#</span>';
+$myTemplate = new StampTE($myTemplateStr);
+$myTemplate->setGreeting('Hello World!');
+$tpl->body->add( $myTemplate );
+$expectedHTML = '<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Welcome to StampTE</title><link  rel="stylesheet" type="text/css" href="style.css" ><script  src="js/script.js" ></script></head>
+<body ><span>Hello World!</span></body>
+</html>';
+asrt( strval($tpl), $expectedHTML );
+
+
+
+$report = xdebug_get_code_coverage();
+$misses = 0;
+$hits = 0;
+
+$covLines = array();
+foreach( $report as $file => $lines ) {
+	$pi = pathinfo( $file );
+	
+	if ( strpos( $file, 'Stamp' ) === false ) continue;
+	$covLines[] = '***** File:'.$file.' ******';
+	
+	$fileData = file_get_contents( $file );
+	$fileLines = explode( "\n", $fileData );
+	$i = 1;
+	foreach( $fileLines as $covLine ) {
+		if ( isset( $lines [$i] ) ) {
+			if ( $lines[$i] === 1 ) {
+				$covLines[] = '[ OK      ] '.$covLine;
+				$hits ++;
+			} else if ( $lines[$i] === -1 ){
+				$covLines[] = '[ MISSED! ] '.$covLine;
+				$misses ++;
+			} else {
+				$covLines[] = '[ -       ] '.$covLine;
+			}
+		} else {
+			$covLines[] = '[ -       ] '.$covLine;
+		}
+		$i ++;
+	}
+}
+$covFile = implode( "\n", $covLines );
+@file_put_contents( 'coverage_log.txt', $covFile );
+
+if ( $hits > 0 ) {
+	$perc = ( $hits / ( $hits + $misses ) ) * 100;
+} else {
+	$perc = 0;
+}
+
 
 echo PHP_EOL;
 echo 'Code Coverage: '.PHP_EOL;
