@@ -1287,44 +1287,30 @@ try {
 $s = new StampTE( NULL );
 pass();
 
-try {
-	$s = new StampTE( 123 );
-	fail();
-} catch( StampTEException $e ) {
-	asrt( strpos( $e->getMessage(), '[S002]' ) === 0, TRUE );
-}
+//non-string values get converted to string
+$s = new StampTE( 123 );
+asrt( strval($s), '123' );
 
+$s = new StampTE( FALSE );
+asrt( strval($s), '' );
 
-try {
-	$s = new StampTE( FALSE );
-	fail();
-} catch( StampTEException $e ) {
-	asrt( strpos( $e->getMessage(), '[S002]' ) === 0, TRUE );
-}
+$s = new StampTE( TRUE );
+asrt( strval($s), '1' );
 
+$s = new StampTE( new StampTE('hello') );
+asrt( strval($s), 'hello' );
 
-try {
-	$s = new StampTE( TRUE );
-	fail();
-} catch( StampTEException $e ) {
-	asrt( strpos( $e->getMessage(), '[S002]' ) === 0, TRUE );
-}
+$s = new StampTE( array() );
+asrt( strval($s), '' );
 
+$s = new StampTE( array(1,2,3) );
+asrt( strval($s), '1,2,3' );
 
-try {
-	$s = new StampTE( new StdClass );
-	fail();
-} catch( StampTEException $e ) {
-	asrt( strpos( $e->getMessage(), '[S002]' ) === 0, TRUE );
-}
+$s = new StampTE( array( 'one'=>'apples', 'two'=>'oranges' ) );
+asrt( strval($s), 'apples,oranges' );
 
-
-try {
-	$s = new StampTE( array() );
-	fail();
-} catch( StampTEException $e ) {
-	asrt( strpos( $e->getMessage(), '[S002]' ) === 0, TRUE );
-}
+$s = new StampTE( new StdClass );
+asrt( strval($s), '[stdClass instance]' );
 
 try {
 	$s = new StampTE( '' );

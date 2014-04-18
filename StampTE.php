@@ -107,7 +107,11 @@ class StampTE
 	{
 		if ( is_null( $tpl ) ) $tpl = '';
 		
-		if ( !is_string( $tpl ) ) throw new StampTEException( '[S002] Template parameter in constructor must be of type STRING.' );
+		if ( is_array( $tpl ) ) $tpl = implode( ',', $tpl );
+		
+		if ( is_object( $tpl ) && !method_exists( $tpl, '__toString' ) ) $tpl = '['.get_class( $tpl ).' instance]';
+		
+		$tpl = (string) $tpl;
 		
 		$this->id       = strval( $id );
 		$this->template = $tpl;
