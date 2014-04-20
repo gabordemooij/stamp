@@ -125,7 +125,7 @@ class StampTE
 	 */
 	public static function createHtml5Utf8Document()
 	{
-		if (is_null(self::$html5Tpl)) {
+		if ( is_null( self::$html5Tpl ) ) {
 			$template = '';
 			$template .= "<!DOCTYPE html>\n";
 			$template .= "<html>\n";
@@ -142,6 +142,7 @@ class StampTE
 			$template .= "</html>";
 			self::$html5Tpl = $template;
 		}
+
 		return new self( self::$html5Tpl );
 	}
 
@@ -365,7 +366,7 @@ class StampTE
 	
 			if ( isset($matches[2]) ) {
 				
-				if ( !is_object( $snippet ) ) throw new StampTEException('[S003] Snippet is not an object or string.');
+				if ( !is_object( $snippet ) ) throw new StampTEException( '[S003] Snippet is not an object or string.' );
 
 				$allowedSnippets = $matches[2];
 				$allowedMap      = array_flip( explode( ',', $allowedSnippets ) );
@@ -613,7 +614,7 @@ class StampTE
 	 */
 	public function setTranslator( $closure )
 	{
-		if ( !is_callable( $closure ) ) throw new StampTEException('[S005] Invalid Translator.');
+		if ( !is_callable( $closure ) ) throw new StampTEException( '[S005] Invalid Translator.' );
 		
 		$this->translator = $closure;
 	}
@@ -627,7 +628,7 @@ class StampTE
 	 */
 	public function setFactory( $factory )
 	{
-		if ( !is_callable( $factory ) ) throw new StampTEException('[S006] Invalid Factory.');
+		if ( !is_callable( $factory ) ) throw new StampTEException( '[S006] Invalid Factory.' );
 		
 		$this->factory = $factory;
 	}
