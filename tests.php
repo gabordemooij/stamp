@@ -35,6 +35,10 @@ function testpack($name) { printtext("\ntesting: ".$name); }
  * The real testing stuff
  */
 require('StampTE.php');
+
+use StampTemplateEngine\StampTE as StampTE;
+use StampTemplateEngine\StampTEException as StampTEException;
+
 testpack("Basics");
 
 $template = '<message>#greet#</message>';

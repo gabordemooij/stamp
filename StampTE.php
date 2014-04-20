@@ -21,6 +21,9 @@
  *  @license New BSD License
  *  ---------------------------------------------------------------------------
  */
+ 
+namespace StampTemplateEngine;
+ 
 class StampTE 
 {
 	/**
@@ -643,4 +646,4 @@ class StampTE
 	}
 }
 //Stamp Exception
-class StampTEException extends Exception {}
+class StampTEException extends \Exception {}
