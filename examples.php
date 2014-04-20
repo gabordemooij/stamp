@@ -2,6 +2,9 @@
 
 require('StampTE.php');
 
+use StampTemplateEngine\StampTE as StampTE;
+use StampTemplateEngine\StampTEException as StampTEException;
+
 
 $t = '
 <table>
