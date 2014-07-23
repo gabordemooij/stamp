@@ -27,6 +27,12 @@ namespace StampTemplateEngine;
 class StampTE 
 {
 	/**
+	 * Clear white space gaps left by
+	 * paste markers or not?
+	 */
+	private static $clearws = true;
+
+	/**
 	 * HTML5 Document template cache.
 	 * @var string
 	 */
@@ -105,6 +111,21 @@ class StampTE
 	 * @var closure 
 	 */
 	protected $factory = null;
+
+	/**
+	 * Sets the white space clearing mechanism.
+	 * TRUE means: clear gaps caused by replaced paste markers.
+	 * FALSE means: leave gaps (faster).
+	 * Default is TRUE.
+	 *
+	 * @param boolean $trueOrFalse preferred method
+	 *
+	 * @return void
+	 */
+	public static function setClearWS( $tf )
+	{
+		self::$clearws = (boolean) $tf;
+	}
 
 	/**
 	 * Returns a StampTE template configured with a proper
@@ -335,6 +356,7 @@ class StampTE
 			$template = preg_replace( "/#\&\w+\?#/m", "", $template );
 		}
 
+		if (self::$clearws) $template = preg_replace('/\s*<!--\sclr\s-->/m', '', $template);
 		return $template;
 	}
 
@@ -359,6 +381,17 @@ class StampTE
 	public function glue( $what, $snippet )
 	{
 		$matches = array();
+
+		$pattern = "<!-- paste:{$what}(";
+		//No conditions! fast track method is possible!
+		if (strpos($this->template, $pattern)===FALSE) {
+			$pattern = "<!-- paste:{$what} -->";
+			$clear = (self::$clearws) ? '<!-- clr -->' : '';
+			$replacement = $clear.$snippet.$pattern;
+			$this->template = str_replace($pattern, $replacement, $this->template);
+			return $this;
+		}
+
 		$pattern = '/\s*<!\-\-\spaste:'.$what.'(\(([a-zA-Z0-9,]+)\))?\s\-\->/';
 
 		$this->template = preg_replace_callback( $pattern, function( $matches ) use ( $snippet, $what ) {
