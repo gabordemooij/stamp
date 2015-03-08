@@ -16,8 +16,8 @@
  *  Stamp t.e.
  *  The Beautiful Template Engine
  *  @author Gabor de Mooij
- *  @version 2.2
- *  @copyright 2013
+ *  @version 2.3
+ *  @copyright 2015
  *  @license New BSD License
  *  ---------------------------------------------------------------------------
  */
@@ -202,22 +202,6 @@ class StampTE
 		$this->template = preg_replace( '/#(\w+)(\?)?#/sU', '#&$1$2#', $this->template );		
 	}
 	
-	/**
-	 * A stupid method that just returns all the glue points in the template.
-	 * Only use this method if you're planning to do some wise-ass shit.
-	 * It's ugly, and horribly slow. 
-	 * 
-	 * @return array 
-	 */
-	public function getGluePoints()
-	{
-		$gluePoints = array();
-		if ( preg_match_all( '/<!\-\-\spaste:(\w+)\s\-\->/', $this->template, $gluePoints ) ) {
-			$gluePoints = ( $gluePoints[1] );
-		}
-		return $gluePoints;
-	}
-
 	/**
 	 * Returns the slots in this Stamp.
 	 * Normally you don't need them but there are some smartypants template processors out there

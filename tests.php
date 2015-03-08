@@ -883,11 +883,7 @@ $expectation = "
 
 asrt(clean($StampTE),clean($expectation));
 
-testpack('Test Introspection');
-$gluePoints = $StampTE->getGluePoints();
-asrt($gluePoints[0],'pond');
-asrt($gluePoints[1],'flowers');
-asrt($gluePoints[2],'selfflower');
+
 
 $stampTE = new StampTE('<!-- slot:castle --><!-- /slot:castle -->');
 $slots = $stampTE->getSlots();
