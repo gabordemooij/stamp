@@ -378,7 +378,7 @@ class StampTE
 			return $this;
 		}
 
-		$pattern = '/\s*<!\-\-\spaste:'.$what.'(\(([a-zA-Z0-9,]+)\))?\s\-\->/';
+		$pattern = '/\s*<!\-\-\spaste:'.$what.'(\(([^\)]+)\))?\s\-\->/';
 
 		$this->template = preg_replace_callback( $pattern, function( $matches ) use ( $snippet, $what ) {
 			$copyOrig = $matches[0];
