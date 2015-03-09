@@ -30,13 +30,13 @@ class StampTE
 	 * Clear white space gaps left by
 	 * paste markers or not?
 	 */
-	private static $clearws = true;
+	private static $clearws = TRUE;
 
 	/**
 	 * HTML5 Document template cache.
 	 * @var string
 	 */
-	private static $html5Tpl = null;
+	private static $html5Tpl = NULL;
 
 	/**
 	 * Holds the template
@@ -88,7 +88,7 @@ class StampTE
 	 * 
 	 * @var string 
 	 */
-	private $select = null;
+	private $select = NULL;
 
 	/**
 	 * Cache array. Cache keeps the planet from burning up.
@@ -103,14 +103,14 @@ class StampTE
 	 * 
 	 * @var closure
 	 */
-	protected $translator = null;
+	protected $translator = NULL;
 	/**
 	 * Holds the factory function to be used whenever
 	 * a Stamp template is returned.
 	 * 
 	 * @var closure 
 	 */
-	protected $factory = null;
+	protected $factory = NULL;
 
 	/**
 	 * Sets the white space clearing mechanism.
@@ -122,9 +122,9 @@ class StampTE
 	 *
 	 * @return void
 	 */
-	public static function setClearWS( $tf )
+	public static function setClearWS( $clearWhiteSpace )
 	{
-		self::$clearws = (boolean) $tf;
+		self::$clearws = (boolean) $clearWhiteSpace;
 	}
 
 	/**
@@ -190,7 +190,7 @@ class StampTE
 		$me             = $this;
 
 		$this->template = preg_replace_callback( $pattern, function( $matches ) use ( $me ) {
-			list(, $type, $id, $snippet) = $matches;
+			list( , $type, $id, $snippet ) = $matches;
 			if ( $type === 'cut' ) {
 				$me->addToSketchBook( $id, $snippet );
 				return '<!-- paste:self'.$id.' -->';
@@ -199,6 +199,7 @@ class StampTE
 				return "#$id#";
 			}
 		}, $this->template );
+
 		$this->template = preg_replace( '/#(\w+)(\?)?#/sU', '#&$1$2#', $this->template );		
 	}
 	
@@ -245,7 +246,7 @@ class StampTE
 	 */
 	public static function load( $filename )
 	{
-		if ( !file_exists( $filename ) ) throw new StampTEException( '[S001] Could not find file: '.$filename );
+		if ( !file_exists( $filename ) ) throw new StampTEException( '[S001] Could not find file: ' . $filename );
 		$template = file_get_contents( $filename );
 		return new static( $template );
 	}
@@ -273,7 +274,7 @@ class StampTE
 	public function get( $id )
 	{
 		if ( strpos( $id, '.') !== FALSE) {
-			$parts = ( explode( '.', $id) );
+			$parts = ( explode( '.', $id ) );
 			$id    = reset( $parts );
 			array_shift( $parts );
 			$rest  = implode( '.', $parts );
@@ -313,6 +314,7 @@ class StampTE
 	public function collect( $list )
 	{
 		if ( isset( $this->cache[$list] ) ) return $this->cache[$list];
+
 		$listItems = explode( '|', $list );
 
 		$collection = array();
@@ -335,7 +337,7 @@ class StampTE
 		$template = $this->template;
 		$template = preg_replace( "/\s*<!--\s*(paste):[a-zA-Z0-9\(\),\/]*\s*-->/m", "", $template );
 
-		if ( strpos($template, '#&' ) !== FALSE) {
+		if ( strpos($template, '#&' ) !== FALSE ) {
 			$template = preg_replace( "/data\-stampte=\"#\&\w+\?#\"/m", "", $template );
 			$template = preg_replace( "/#\&\w+\?#/m", "", $template );
 		}
@@ -366,7 +368,7 @@ class StampTE
 	{
 		$matches = array();
 		$pattern = "<!-- paste:{$what}(";
-		if (strpos($this->template, $pattern)===FALSE) {
+		if ( strpos( $this->template, $pattern ) === FALSE ) {
 			$pattern = "<!-- paste:{$what} -->";
 			$clear = ( self::$clearws ) ? '<!-- clr -->' : '';
 			$replacement = $clear.$snippet.$pattern;
@@ -589,11 +591,11 @@ class StampTE
 	 */
 	public function add( StampTE $stamp )
 	{
-		if ( $this->select === null ) {
+		if ( $this->select === NULL ) {
 			$this->select = 'self'.$stamp->getID();
 		}
 		$this->glue( $this->select, $stamp );
-		$this->select = null; //reset
+		$this->select = NULL; //reset
 		return $this;
 	}
 
@@ -610,7 +612,7 @@ class StampTE
 	 */
 	public function setTranslator( $closure )
 	{
-		if ( !is_callable( $closure ) ) throw new StampTEException( '[S005] Invalid Translator.' );
+		if ( !is_callable( $closure ) ) throw new StampTEException( '[S005] Invalid Translator. Translator must be callable.' );
 		
 		$this->translator = $closure;
 	}
@@ -624,7 +626,7 @@ class StampTE
 	 */
 	public function setFactory( $factory )
 	{
-		if ( !is_callable( $factory ) ) throw new StampTEException( '[S006] Invalid Factory.' );
+		if ( !is_callable( $factory ) ) throw new StampTEException( '[S006] Invalid Factory. Factory must be callable.' );
 		
 		$this->factory = $factory;
 	}
