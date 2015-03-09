@@ -365,35 +365,14 @@ class StampTE
 	public function glue( $what, $snippet )
 	{
 		$matches = array();
-
 		$pattern = "<!-- paste:{$what}(";
-		//No conditions! fast track method is possible!
 		if (strpos($this->template, $pattern)===FALSE) {
 			$pattern = "<!-- paste:{$what} -->";
-			$clear = (self::$clearws) ? '<!-- clr -->' : '';
+			$clear = ( self::$clearws ) ? '<!-- clr -->' : '';
 			$replacement = $clear.$snippet.$pattern;
-			$this->template = str_replace($pattern, $replacement, $this->template);
+			$this->template = str_replace( $pattern, $replacement, $this->template );
 			return $this;
 		}
-
-		$pattern = '/\s*<!\-\-\spaste:'.$what.'(\(([a-zA-Z0-9,]+)\))?\s\-\->/';
-
-		$this->template = preg_replace_callback( $pattern, function( $matches ) use ( $snippet, $what ) {
-			$copyOrig = $matches[0];
-	
-			if ( isset($matches[2]) ) {
-				
-				if ( !is_object( $snippet ) ) throw new StampTEException( '[S003] Snippet is not an object or string.' );
-
-				$allowedSnippets = $matches[2];
-				$allowedMap      = array_flip( explode( ',', $allowedSnippets ) );
-				if ( !isset( $allowedMap[$snippet->getID()] ) ) throw new StampTEException( '[S102] Snippet '.$snippet->getID().' not allowed in slot '.$what );
-			}
-
-			return $snippet.$copyOrig;
-
-		}, $this->template );
-
 		return $this;
 	}
 
