@@ -382,9 +382,9 @@ class StampTE
 
 		$this->template = preg_replace_callback( $pattern, function( $matches ) use ( $snippet, $what ) {
 			$copyOrig = $matches[0];
-	
+
 			if ( isset($matches[2]) ) {
-				
+
 				if ( !is_object( $snippet ) ) throw new StampTEException( '[S003] Snippet is not an object or string.' );
 
 				$allowedSnippets = $matches[2];
