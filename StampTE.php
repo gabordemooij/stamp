@@ -340,7 +340,7 @@ class StampTE
 			$template = preg_replace( "/#\&\w+\?#/m", "", $template );
 		}
 
-		if (self::$clearws) $template = preg_replace('/\s*<!--\sclr\s-->/m', '', $template);
+		if ( self::$clearws ) $template = preg_replace( '/\s*<!--\sclr\s-->/m', '', $template );
 		return $template;
 	}
 
