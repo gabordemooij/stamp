@@ -374,7 +374,7 @@ class StampTE
 			$pattern = "<!-- paste:{$what} -->";
 			$clear = (self::$clearws) ? '<!-- clr -->' : '';
 			$replacement = $clear.$snippet.$pattern;
-			$this->template = str_replace($pattern, $replacement, $this->template);
+			$this->template = str_replace( $pattern, $replacement, $this->template );
 			return $this;
 		}
 
