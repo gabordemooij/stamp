@@ -1404,6 +1404,54 @@ $expectedHTML = '<!DOCTYPE html>
 asrt( strval($tpl), $expectedHTML );
 
 
+$expectedDinnerWithoutSpace = "
+<pan>
+</pan>
+<plate><steak />
+</plate>
+";
+
+$expectedDinnerWithSpace = "
+<pan>
+</pan>
+<plate>
+	
+		<steak />
+</plate>
+";
+
+
+$dinner = new StampTE("
+<pan>
+	<!-- cut:steak --><steak /><!-- /cut:steak -->
+</pan>
+<plate>
+	<!-- paste:plate -->
+</plate>
+");
+
+$dinner->setClearWS( TRUE );
+$steak = $dinner->getSteak();
+$dinner->plate->add( $steak );
+
+asrt( strval( $dinner ), $expectedDinnerWithoutSpace );
+
+$dinner = new StampTE("
+<pan>
+	<!-- cut:steak -->
+		<steak />
+	<!-- /cut:steak -->
+</pan>
+<plate>
+	<!-- paste:plate -->
+</plate>
+");
+
+$dinner->setClearWS( FALSE );
+$steak = $dinner->getSteak();
+$dinner->plate->add( $steak );
+
+asrt( strval( $dinner ), $expectedDinnerWithSpace );
 
 $report = xdebug_get_code_coverage();
 $misses = 0;
