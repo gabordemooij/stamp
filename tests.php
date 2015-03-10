@@ -314,6 +314,27 @@ $stampTE = new StampTE($template);
 $stampTE->regions->add($stampTE->getRegion()->setValue('象形字'));
 asrt((string)$stampTE, $expect);
 
+//even the definitions of the cut/paste markers may be UTF-8
+$template ="<div>象形字
+	<!-- cut:測試 -->
+	<div>象形字#value#</div>
+	<!-- /cut:測試 -->
+	<!-- paste:測試2 -->
+</div>";
+
+$expect = "<div>象形字
+	<div>象形字象形字</div>
+</div>";
+
+$stampTE = new StampTE($template);
+$region = $stampTE->get('測試');
+$region->setValue('象形字');
+$stampTE->glue('測試2', $region);
+asrt((string)$stampTE, $expect);
+
+
+
+
 testpack("Test Cut and Paste Metaphor");
 $template = "
 	<box>
