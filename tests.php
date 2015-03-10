@@ -883,10 +883,14 @@ $expectation = "
 
 asrt(clean($StampTE),clean($expectation));
 
-
+class StampTEProxy extends StampTE {
+	public static function getSlots($object) {
+		return $object->slots;
+	}
+}
 
 $stampTE = new StampTE('<!-- slot:castle --><!-- /slot:castle -->');
-$slots = $stampTE->getSlots();
+$slots = StampTEProxy::getSlots( $stampTE );
 asrt(isset($slots['castle']),true);
 
 testpack('Test Filters');

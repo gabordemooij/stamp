@@ -30,13 +30,13 @@ class StampTE
 	 * Clear white space gaps left by
 	 * paste markers or not?
 	 */
-	private static $clearws = TRUE;
+	protected static $clearws = TRUE;
 
 	/**
 	 * HTML5 Document template cache.
 	 * @var string
 	 */
-	private static $html5Tpl = NULL;
+	protected static $html5Tpl = NULL;
 
 	/**
 	 * Holds the template
@@ -48,20 +48,20 @@ class StampTE
 	 * Collection of initial matches from template
 	 * @var array
 	 */
-	private $matches;
+	protected $matches;
 
 	/**
 	 * Processed array of HTML parts found in template,
 	 * keyed by IDs.
 	 * @var array
 	 */
-	private $catalogue;
+	protected $catalogue;
 
 	/**
 	 * Identifier of current template snippet.
 	 * @var string 
 	 */
-	private $id;
+	protected $id;
 
 	/**
 	 * A Stamp contains a sketchbook with snippets to generate new
@@ -70,7 +70,7 @@ class StampTE
 	 * 
 	 * @var array 
 	 */
-	private $sketchBook = array();
+	protected $sketchBook = array();
 
 	/**
 	 * List of slots in the current Stamp.
@@ -78,7 +78,7 @@ class StampTE
 	 * 
 	 * @var array
 	 */
-	private $slots = array();
+	protected $slots = array();
 
 	/**
 	 * Selector ID. The currently selected Glue Point.
@@ -88,14 +88,14 @@ class StampTE
 	 * 
 	 * @var string 
 	 */
-	private $select = NULL;
+	protected $select = NULL;
 
 	/**
 	 * Cache array. Cache keeps the planet from burning up.
 	 * 
 	 * @var array 
 	 */
-	private $cache = array();
+	protected $cache = array();
 
 	/**
 	 * Holds the translator function to be used for
@@ -169,7 +169,15 @@ class StampTE
 
 	/**
 	 * Constructor. Pass nothing if you plan to use cache.
-	 * 
+	 * Creates a new Stamp object from a string.
+	 * Upon constructing a Stamp object the string will be parsed.
+	 * All cut points, i.e. <!-- cut:X -->Y<!-- /cut:X --> will
+	 * be collected and stored in the internal 'sketchbook'.
+	 * They can now be used as HTML snippets like this:
+	 *
+	 * $stpl = new StampTE( $tpl );
+	 * $stpl->getX(); //where X is cut point
+	 *
 	 * @param string $tpl HTML Template
 	 * @param string $id  identification string for this template 
 	 */
@@ -186,7 +194,7 @@ class StampTE
 		$this->id       = strval( $id );
 		$this->template = $tpl;
 		$this->matches  = array();
-		$pattern        = '/\s*<!\-\-\s(cut|slot):(\w+)\s\-\->(.*)?<!\-\-\s\/(cut|slot):\2\s\-\->/sU';
+		$pattern        = '/\s*<!\-\-\s(cut|slot):(\S+)\s\-\->(.*)?<!\-\-\s\/(cut|slot):\2\s\-\->/sU';
 		$me             = $this;
 
 		$this->template = preg_replace_callback( $pattern, function( $matches ) use ( $me ) {
@@ -195,33 +203,12 @@ class StampTE
 				$me->addToSketchBook( $id, $snippet );
 				return '<!-- paste:self'.$id.' -->';
 			} else {
-				$me->addToSlots( $id );
+				$me->slots[$id] = TRUE;
 				return "#$id#";
 			}
 		}, $this->template );
 
 		$this->template = preg_replace( '/#(\w+)(\?)?#/sU', '#&$1$2#', $this->template );		
-	}
-	
-	/**
-	 * Returns the slots in this Stamp.
-	 * Normally you don't need them but there are some smartypants template processors out there
-	 * that do.
-	 * 
-	 * @return array 
-	 */
-	public function getSlots()
-	{
-		return $this->slots;
-	}
-
-	/**
-	 * Adds a slot to the map of slots.
-	 * @param type $id 
-	 */
-	public function addToSlots( $id ) 
-	{
-		$this->slots[$id] = TRUE;
 	}
 	
 	/**
@@ -358,10 +345,27 @@ class StampTE
 	/**
 	 * Glues a snippet to a glue point in the current snippet/template.
 	 * The glue() method also accepts raw strings.
+	 *
+	 * The glue method will append the Stamp object or string specified in
+	 * $snippet to the template at the glue point marked by the glue point marker,
+	 * i.e. <!-- patse:X --> where X is the name of the glue point.
+	 * A glue point can have conditions, in this case you MUST provide a Stamp
+	 * object rather than a raw string because the ID of the object needs to be checked.
+	 * Conditional glue points have the format: <!-- paste:X(Y,Z) --> where Y,Z are the
+	 * allowed IDS (from the cut markers).
+	 *
+	 * Note that conditional glue points are rather slow. Consider writing a small shell
+	 * script to remove the conditions before deploying your templates to a production
+	 * environment (assuming they're not needed there).
+	 *
+	 * If you pass a raw string for a conditional glue point you'll get a S003 exception.
+	 * If your Stamp object is rejected by the glue point you'll get a S102 exception.
 	 * 
+	 * @throws StampTEException
+	 *
 	 * @param string  $what    ID of the Glue Point you want to append the contents of the snippet to.
 	 * @param StampTE|string   $snippet a StampTE snippet/template to be glued at this point 
-	 * 
+	 *
 	 * @return StampTE $snippet self, chainable
 	 */
 	public function glue( $what, $snippet )
@@ -385,7 +389,7 @@ class StampTE
 
 			if ( isset($matches[2]) ) {
 
-				if ( !is_object( $snippet ) ) throw new StampTEException( '[S003] Snippet is not an object or string.' );
+				if ( !is_object( $snippet ) ) throw new StampTEException( '[S003] Snippet is not an object or string. Conditional glue point requires object.' );
 
 				$allowedSnippets = $matches[2];
 				$allowedMap      = array_flip( explode( ',', $allowedSnippets ) );
