@@ -1264,15 +1264,6 @@ asrt( strval($s), '1' );
 $s = new StampTE( new StampTE('hello') );
 asrt( strval($s), 'hello' );
 
-$s = new StampTE( array() );
-asrt( strval($s), '' );
-
-$s = new StampTE( array(1,2,3) );
-asrt( strval($s), '1,2,3' );
-
-$s = new StampTE( array( 'one'=>'apples', 'two'=>'oranges' ) );
-asrt( strval($s), 'apples,oranges' );
-
 $s = new StampTE( new StdClass );
 asrt( strval($s), '[stdClass instance]' );
 
@@ -1378,10 +1369,12 @@ $expectedHTML = '<!DOCTYPE html>
 <html>
 <head>
 <meta charset="UTF-8">
-<title></title></head>
-<body ></body>
+<title></title>
+</head>
+<body >
+</body>
 </html>';
-asrt(strval($tpl), $expectedHTML);
+asrt( clean(strval($tpl)), clean($expectedHTML));
 
 $tpl->setTitle('Welcome to StampTE');
 $tpl->add($tpl
@@ -1405,8 +1398,8 @@ $expectedHTML = '<!DOCTYPE html>
 <title>Welcome to StampTE</title><link  rel="stylesheet" type="text/css" href="style.css" ><script  src="js/script.js" ></script></head>
 <body ><span>Hello World!</span></body>
 </html>';
-asrt( strval($tpl), $expectedHTML );
-
+asrt( clean( strval( $tpl ) ), clean( $expectedHTML ) );
+asrt( ( strlen( clean( strval( $tpl ) ) ) > 0 ), TRUE );
 
 $expectedDinnerWithoutSpace = "
 <pan>

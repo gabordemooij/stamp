@@ -146,25 +146,20 @@ class StampTE
 	 */
 	public static function createHtml5Utf8Document()
 	{
-		if ( is_null( self::$html5Tpl ) ) {
-			$template = '';
-			$template .= "<!DOCTYPE html>\n";
-			$template .= "<html>\n";
-			$template .= "<head>\n";
-			$template .= "<meta charset=\"UTF-8\">\n";
-			$template .= "<title>#title?#</title>\n";
-			$template .= "<!-- cut:link --><link data-stampte=\"#linkAttributes?#\" rel=\"#rel?#\" type=\"#type?#\" href=\"#href?#\" ><!-- /cut:link -->\n";
-			$template .= "<!-- cut:script --><script data-stampte=\"#scriptAttributes?#\" src=\"#src?#\" ></script><!-- /cut:script -->\n";
-			$template .= "<!-- paste:head -->";
-			$template .= "</head>\n";
-			$template .= "<body data-stampte=\"#bodyAttributes?#\">";
-			$template .= "<!-- paste:body -->";
-			$template .= "</body>\n";
-			$template .= "</html>";
-			self::$html5Tpl = $template;
-		}
+		return self::fromFile( 'html5document.html' );
+	}
 
-		return new self( self::$html5Tpl );
+	/**
+	 * Returns a Stamp instance using the contents of the specified
+	 * file.
+	 *
+	 * @param string $fname path to file to read
+	 *
+	 * @return StampTE
+	 */
+	public static function fromFile( $fname )
+	{
+		return new self( file_get_contents( $fname ) );
 	}
 
 	/**
@@ -184,8 +179,6 @@ class StampTE
 	public function __construct( $tpl='', $id='root' )
 	{
 		if ( is_null( $tpl ) ) $tpl = '';
-		
-		if ( is_array( $tpl ) ) $tpl = implode( ',', $tpl );
 		
 		if ( is_object( $tpl ) && !method_exists( $tpl, '__toString' ) ) $tpl = '['.get_class( $tpl ).' instance]';
 		
