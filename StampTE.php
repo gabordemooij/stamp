@@ -189,14 +189,15 @@ class StampTE
 		$this->matches  = array();
 		$pattern        = '/\s*<!\-\-\s(cut|slot):(\S+)\s\-\->(.*)?<!\-\-\s\/(cut|slot):\2\s\-\->/sU';
 		$me             = $this;
+		$slots          = &$this->slots;
 
-		$this->template = preg_replace_callback( $pattern, function( $matches ) use ( &$me ) {
+		$this->template = preg_replace_callback( $pattern, function( $matches ) use ( $me, &$slots ) {
 			list( , $type, $id, $snippet ) = $matches;
 			if ( $type === 'cut' ) {
 				$me->addToSketchBook( $id, $snippet );
 				return '<!-- paste:self'.$id.' -->';
 			} else {
-				$me->slots[$id] = TRUE;
+				$slots[$id] = TRUE;
 				return "#$id#";
 			}
 		}, $this->template );
