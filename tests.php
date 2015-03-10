@@ -1,6 +1,8 @@
 <?php
 
-xdebug_start_code_coverage( XDEBUG_CC_UNUSED | XDEBUG_CC_DEAD_CODE );
+$XDEBUG = (boolean) ( function_exists( 'xdebug_start_code_coverage' ) );
+
+if ( $XDEBUG ) xdebug_start_code_coverage( XDEBUG_CC_UNUSED | XDEBUG_CC_DEAD_CODE );
 
 /**
  * Basic testing functions
@@ -1473,6 +1475,8 @@ $steak = $dinner->getSteak();
 $dinner->plate->add( $steak );
 
 asrt( strval( $dinner ), $expectedDinnerWithSpace );
+
+if ( !$XDEBUG ) exit(0);
 
 $report = xdebug_get_code_coverage();
 $misses = 0;
