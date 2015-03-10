@@ -5,31 +5,43 @@ xdebug_start_code_coverage( XDEBUG_CC_UNUSED | XDEBUG_CC_DEAD_CODE );
 /**
  * Basic testing functions
  */
+
 $c = 0;
-function printtext($text) { echo $text; }
+
+function printtext($text) {
+	echo $text;
+}
+
 function asrt( $a, $b ) {
-	if ($a === $b) {
+	if ( $a === $b ) {
 		global $tests;
 		$tests++;
-		print( "[".$tests."]" );
-	}
-	else {
-		printtext("FAILED TEST: EXPECTED $b BUT GOT: $a ");
+		print( "[{$tests}]" );
+	} else {
+		printtext( "FAILED TEST: EXPECTED {$b} BUT GOT: {$a} " );
 		fail();
 	}
 }
+
 function pass() {
 	global $tests;
 	$tests++;
-	print( "[".$tests."]" );
+	print( "[{$tests}]" );
 }
+
 function fail() {
-	printtext("FAILED TEST");
+	printtext( "FAILED TEST" );
 	debug_print_backtrace();
 	exit(1);
 }
-function clean($s) { return preg_replace("/\s/m","",$s); }
-function testpack($name) { printtext("\ntesting: ".$name); }
+
+function clean($s) { 
+	return preg_replace( "/\s/m", "" ,$s );
+}
+
+function testpack($name) {
+	printtext( "\ntesting: ".$name );
+}
 
 /**
  * The real testing stuff
@@ -39,49 +51,49 @@ require('StampTE.php');
 use StampTemplateEngine\StampTE as StampTE;
 use StampTemplateEngine\StampTEException as StampTEException;
 
-testpack("Basics");
+testpack( "Basics" );
 
 $template = '<message>#greet#</message>';
-$s = new StampTE($template);
-$s->inject('greet','<HELLO>');
-asrt('<message>&lt;HELLO&gt;</message>',$s->__toString());
+$s = new StampTE( $template );
+$s->inject( 'greet','<HELLO>' );
+asrt( '<message>&lt;HELLO&gt;</message>', $s->__toString() );
 
 //does the StampTETE class exist?
-if (class_exists('StampTE')) pass();
+if ( class_exists( 'StampTE' ) ) pass();
 
-testpack('Test Whitespace handling');
+testpack( 'Test Whitespace handling' );
 //Can we succesfully create an instance of the StampTETE class?
 $StampTE = new StampTE('');
 
 //Test the wash() function
 $template = "HELL<!-- paste:me -->OWORLD";
-$StampTE = new StampTE($template);
-asrt("HELLOWORLD",trim($StampTE));
+$StampTE = new StampTE( $template );
+asrt( "HELLOWORLD", trim( $StampTE ) );
 
 $template = "HELL<!-- paste:me(and,me) -->OWORLD";
-$StampTE = new StampTE($template);
-asrt("HELLOWORLD",trim($StampTE));
+$StampTE = new StampTE( $template );
+asrt("HELLOWORLD", trim( $StampTE ) );
 
 $template = "HELL<!-- paste:test -->OWORLD";
-$StampTE = new StampTE($template);
-asrt("HELLOWORLD",trim($StampTE));
+$StampTE = new StampTE( $template );
+asrt("HELLOWORLD", trim( $StampTE ) );
 
 $template = "HELL<!-- cut:wow -->OW<!-- /cut:wow -->ORLD";
-$StampTE = new StampTE($template);
-asrt("HELLORLD",trim($StampTE));
+$StampTE = new StampTE( $template );
+asrt("HELLORLD", trim( $StampTE ) );
 
 $template = "HELLO
 
 
 
 WORLD";
-$StampTE = new StampTE($template);
+$StampTE = new StampTE( $template );
 asrt("HELLO
 
 
 
-WORLD",trim($StampTE));
-asrt($template,trim($StampTE));
+WORLD", trim( $StampTE ) );
+asrt( $template, trim( $StampTE ) );
 
 //test whitespace
 $template ="<div>
@@ -94,8 +106,8 @@ $template ="<div>
 $expect = "<div>
 </div>";
 
-$stampTE = new StampTE($template);
-asrt((string)$stampTE, $expect);
+$stampTE = new StampTE( $template );
+asrt( (string) $stampTE, $expect );
 
 
 $template ="<div>
@@ -109,9 +121,9 @@ $expect = "<div>
 	<div>region</div>
 </div>";
 
-$stampTE = new StampTE($template);
-$stampTE->add($stampTE->getRegion());
-asrt((string)$stampTE, $expect);
+$stampTE = new StampTE( $template );
+$stampTE->add( $stampTE->getRegion() );
+asrt( (string) $stampTE, $expect );
 
 $template ="<div>
 	<!-- cut:region -->
@@ -124,9 +136,9 @@ $expect = "<div>
 	<div>region</div>
 </div>";
 
-$stampTE = new StampTE($template);
-$stampTE->regions->add($stampTE->getRegion());
-asrt((string)$stampTE, $expect);
+$stampTE = new StampTE( $template );
+$stampTE->regions->add( $stampTE->getRegion() );
+asrt( (string) $stampTE, $expect );
 
 $template ="<div>
 	<!-- cut:region -->
@@ -145,9 +157,9 @@ $expect = "<div>
 	<div>region</div>
 </div>";
 
-$stampTE = new StampTE($template);
-$stampTE->add($stampTE->getRegion());
-asrt((string)$stampTE, $expect);
+$stampTE = new StampTE( $template );
+$stampTE->add( $stampTE->getRegion() );
+asrt( (string) $stampTE, $expect );
 
 
 $template ="<div>
@@ -161,9 +173,9 @@ $expect = "<div>
 	<div>|lorem ipsum|</div>
 </div>";
 
-$stampTE = new StampTE($template);
-$stampTE->regions->add($stampTE->getRegion()->setValue('lorem ipsum'));
-asrt((string)$stampTE, $expect);
+$stampTE = new StampTE( $template );
+$stampTE->regions->add( $stampTE->getRegion()->setValue( 'lorem ipsum' ) );
+asrt( (string) $stampTE, $expect );
 
 $template ="<div>
 	<!-- cut:region -->
@@ -178,9 +190,9 @@ $expect = "<div>
 	lorem ipsum|</div>
 </div>";
 
-$stampTE = new StampTE($template);
-$stampTE->regions->add($stampTE->getRegion()->setValue('lorem ipsum'));
-asrt((string)$stampTE, $expect);
+$stampTE = new StampTE( $template );
+$stampTE->regions->add( $stampTE->getRegion()->setValue( 'lorem ipsum' ) );
+asrt( (string) $stampTE, $expect );
 
 
 $template ="<div>
@@ -194,9 +206,9 @@ $expect = "<div>
 	<div>|lorem ipsum|</div>
 </div>";
 
-$stampTE = new StampTE($template);
-$stampTE->regions->add($stampTE->getRegion()->setValue('lorem ipsum'));
-asrt((string)$stampTE, $expect);
+$stampTE = new StampTE( $template );
+$stampTE->regions->add( $stampTE->getRegion()->setValue( 'lorem ipsum' ) );
+asrt( (string) $stampTE, $expect );
 
 
 $template ="<div>
@@ -210,10 +222,9 @@ $expect = "<div>
 	<div>|lorem ipsum|</div>
 </div>";
 
-$stampTE = new StampTE($template);
-$stampTE->regions->add($stampTE->getRegion()->setValue('lorem ipsum'));
-asrt((string)$stampTE, $expect);
-
+$stampTE = new StampTE( $template );
+$stampTE->regions->add( $stampTE->getRegion()->setValue( 'lorem ipsum' ) );
+asrt( (string) $stampTE, $expect );
 
 $template ="<div>
 	<!-- cut:region -->
@@ -226,10 +237,9 @@ $expect = "<div>
 	<div>|lorem ipsum|</div>
 </div>";
 
-$stampTE = new StampTE($template);
-$stampTE->regions->add($stampTE->getRegion()->setValue('lorem ipsum'));
-asrt((string)$stampTE, $expect);
-
+$stampTE = new StampTE( $template );
+$stampTE->regions->add( $stampTE->getRegion()->setValue( 'lorem ipsum' ) );
+asrt( (string) $stampTE, $expect );
 
 $template ="<div>
 	<!-- cut:region -->
@@ -243,10 +253,9 @@ $expect = "<div>
 	<div>||</div>
 </div>";
 
-$stampTE = new StampTE($template);
-$stampTE->regions->add($stampTE->getRegion());
-asrt((string)$stampTE, $expect);
-
+$stampTE = new StampTE( $template );
+$stampTE->regions->add( $stampTE->getRegion() );
+asrt( (string) $stampTE, $expect );
 
 $template ="<div>
 	<!-- cut:region -->
@@ -261,12 +270,11 @@ $expect = "<div>
 	<div>region </div>
 </div>";
 
-$stampTE = new StampTE($template);
-$stampTE->regions->add($stampTE->getRegion());
-asrt((string)$stampTE, $expect);
+$stampTE = new StampTE( $template );
+$stampTE->regions->add( $stampTE->getRegion() );
+asrt( (string) $stampTE, $expect );
 
-
-testpack('UTF8 Tests');
+testpack( 'UTF8 Tests' );
 
 $template ="<div>
 	<!-- cut:region -->
@@ -279,10 +287,9 @@ $expect = "<div>
 	<div>象形字</div>
 </div>";
 
-$stampTE = new StampTE($template);
-$stampTE->regions->add($stampTE->getRegion());
-asrt((string)$stampTE, $expect);
-
+$stampTE = new StampTE( $template );
+$stampTE->regions->add( $stampTE->getRegion() );
+asrt( (string) $stampTE, $expect );
 
 $template ="<div>
 	<!-- cut:region -->
@@ -295,9 +302,9 @@ $expect = "<div>
 	<div>象形字</div>
 </div>";
 
-$stampTE = new StampTE($template);
-$stampTE->regions->add($stampTE->getRegion()->setValue('象形字'));
-asrt((string)$stampTE, $expect);
+$stampTE = new StampTE( $template );
+$stampTE->regions->add( $stampTE->getRegion()->setValue( '象形字' ) );
+asrt( (string) $stampTE, $expect );
 
 $template ="<div>象形字
 	<!-- cut:region -->
@@ -310,9 +317,9 @@ $expect = "<div>象形字
 	<div>象形字象形字</div>
 </div>";
 
-$stampTE = new StampTE($template);
-$stampTE->regions->add($stampTE->getRegion()->setValue('象形字'));
-asrt((string)$stampTE, $expect);
+$stampTE = new StampTE( $template );
+$stampTE->regions->add( $stampTE->getRegion()->setValue( '象形字' ) );
+asrt( (string) $stampTE, $expect );
 
 //even the definitions of the cut/paste markers may be UTF-8
 $template ="<div>象形字
@@ -326,16 +333,13 @@ $expect = "<div>象形字
 	<div>象形字象形字</div>
 </div>";
 
-$stampTE = new StampTE($template);
-$region = $stampTE->get('測試');
-$region->setValue('象形字');
-$stampTE->glue('測試2', $region);
-asrt((string)$stampTE, $expect);
+$stampTE = new StampTE( $template );
+$region = $stampTE->get( '測試' );
+$region->setValue( '象形字' );
+$stampTE->glue( '測試2', $region );
+asrt( (string) $stampTE, $expect );
 
-
-
-
-testpack("Test Cut and Paste Metaphor");
+testpack('Test Cut and Paste Metaphor');
 $template = "
 	<box>
 		<!-- cut:fish -->
@@ -350,9 +354,9 @@ $template = "
 	</bowl>
 ";
 
-$StampTE = new StampTE($template);
-$fish = $StampTE->get("fish");
-$StampTE->glue('water',$fish);
+$StampTE = new StampTE( $template );
+$fish = $StampTE->get( 'fish' );
+$StampTE->glue( 'water', $fish );
 
 $expectation = "
 	<box>
@@ -364,7 +368,7 @@ $expectation = "
 			</fish>
 	</bowl>
 ";
-asrt(clean($StampTE),clean($expectation));
+asrt( clean( $StampTE ),clean( $expectation ) );
 
 //Does it work with more than one cut area?
 $template = "
@@ -384,9 +388,9 @@ $template = "
 	</bowl>
 ";
 
-$StampTE = new StampTE($template);
-$fish = $StampTE->get("fish");
-$StampTE->glue('water',$fish);
+$StampTE = new StampTE( $template );
+$fish = $StampTE->get( 'fish' );
+$StampTE->glue( 'water', $fish );
 
 $expectation = "
 	<box>
@@ -398,13 +402,13 @@ $expectation = "
 			</fish>
 	</bowl>
 ";
-asrt(clean($StampTE),clean($expectation));
+asrt( clean( $StampTE ), clean( $expectation ) );
 
 //Can we put more than one fish in the bowl?
-$StampTE = new StampTE($template);
-$fish = $StampTE->get("fish");
-$StampTE->glue('water',$fish);
-$StampTE->glue('water',$fish);
+$StampTE = new StampTE( $template );
+$fish = $StampTE->get( 'fish' );
+$StampTE->glue( 'water',$fish );
+$StampTE->glue( 'water',$fish );
 
 $expectation = "
 	<box>
@@ -420,7 +424,7 @@ $expectation = "
 			</fish>
 	</bowl>
 ";
-asrt(clean($StampTE),clean($expectation));
+asrt( clean( $StampTE ), clean( $expectation ) );
 
 //What about multiple slots?
 $template = "
@@ -443,12 +447,11 @@ $template = "
 	</bowl>
 ";
 
-$StampTE = new StampTE($template);
-$redfish = $StampTE->get("redfish");
-$yellowfish = $StampTE->get("yellowfish");
-$StampTE->glue('bowl1',$redfish);
-$StampTE->glue('bowl2',$yellowfish);
-
+$StampTE = new StampTE( $template );
+$redfish = $StampTE->get( 'redfish' );
+$yellowfish = $StampTE->get( 'yellowfish' );
+$StampTE->glue( 'bowl1', $redfish );
+$StampTE->glue( 'bowl2', $yellowfish );
 
 $expectation = "
 	<box>
@@ -461,16 +464,15 @@ $expectation = "
 	</bowl>
 ";
 
-asrt(clean($StampTE),clean($expectation));
+asrt( clean( $StampTE ), clean( $expectation ) );
 
 //now with glueAll, to do it all in one run...
-$StampTE = new StampTE($template);
-$redfish = $StampTE->get("redfish");
-$yellowfish = $StampTE->get("yellowfish");
-$StampTE->glueAll(array('bowl1'=>$redfish,'bowl2'=>$yellowfish));
+$StampTE = new StampTE( $template );
+$redfish = $StampTE->get( 'redfish' );
+$yellowfish = $StampTE->get( 'yellowfish' );
+$StampTE->glueAll( array( 'bowl1' => $redfish, 'bowl2' => $yellowfish ) );
 
-
-asrt(clean($StampTE),clean($expectation));
+asrt( clean( $StampTE ), clean( $expectation ) );
 
 //Now put the castle from the bowl in the box as well.
 $template = "
@@ -494,14 +496,13 @@ $template = "
 	</bowl>
 ";
 
-$StampTE = new StampTE($template);
-$redfish = $StampTE->get("redfish");
-$yellowfish = $StampTE->get("yellowfish");
-$StampTE->glue('bowl1',$redfish);
-$StampTE->glue('bowl2',$yellowfish);
-$castle = $StampTE->get('castle');
-$StampTE->glue('box',$castle);
-
+$StampTE = new StampTE( $template );
+$redfish = $StampTE->get( 'redfish' );
+$yellowfish = $StampTE->get( 'yellowfish' );
+$StampTE->glue( 'bowl1', $redfish );
+$StampTE->glue( 'bowl2', $yellowfish );
+$castle = $StampTE->get( 'castle' );
+$StampTE->glue( 'box', $castle );
 
 $expectation = "
 	<box>
@@ -515,7 +516,7 @@ $expectation = "
 	</bowl>
 ";
 
-asrt(clean($StampTE),clean($expectation));
+asrt( clean( $StampTE ), clean( $expectation ) );
 
 //Test same, in combination with slots (complex template)
 $template = "
@@ -1421,6 +1422,8 @@ $expectedHTML = '<!DOCTYPE html>
 </html>';
 asrt( clean( strval( $tpl ) ), clean( $expectedHTML ) );
 asrt( ( strlen( clean( strval( $tpl ) ) ) > 0 ), TRUE );
+
+testpack('Test white space handling options.');
 
 $expectedDinnerWithoutSpace = "
 <pan>
