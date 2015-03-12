@@ -1,10 +1,22 @@
 <?php
 
-require('StampTE.php');
+/**
+ *  ---------------------------------------------------------------------------
+ *  Stamp t.e. Examples
+ *  @author Gabor de Mooij
+ *  ---------------------------------------------------------------------------
+ */
+
+require( 'StampTE.php' );
 
 use StampTemplateEngine\StampTE as StampTE;
 use StampTemplateEngine\StampTEException as StampTEException;
 
+/**
+ *  ---------------------------------------------------------------------------
+ *  Example #1: Pizza prices, an introduction
+ *  ---------------------------------------------------------------------------
+ */
 
 $t = '
 <table>
@@ -23,22 +35,25 @@ $data = array(
 	'Tonno' => '7.99'
 );
 
-
-
-$priceList = new StampTE($t);
+$priceList = new StampTE( $t );
 
 $dish = $priceList->getPizza(); 
 
-foreach($data as $name=>$price) {
+foreach( $data as $name => $price ) {
 	$pizza = $dish->copy(); 
-	$pizza->setName($name);
-	$pizza->setPrice($price);
+	$pizza
+		->setName( $name )
+		->setPrice( $price );
 	$priceList->add( $pizza ); 
 }
 
 echo $priceList;
-//exit;
 
+/**
+ *  ---------------------------------------------------------------------------
+ *  Example #2: Building a form, the basics
+ *  ---------------------------------------------------------------------------
+ */
 
 $t = '
 <form action="#action#" method="post">
@@ -48,34 +63,37 @@ $t = '
 </form>
 ';
 
-$form = new StampTE($t);
+$form = new StampTE( $t );
 
 $textField = $form->getTextField();
-$textField->setLabel('Your Name')
-	->setName('person')
-	->setValue('It\'s me!');
+$textField
+	->setLabel( 'Your Name' )
+	->setName( 'person' )
+	->setValue( 'It\'s me!' );
 
+$form->add( $textField );
+echo "\n\n\n".$form;
 
-$form->add($textField);
-echo "\n\n\n\n".$form;
-
-
+/**
+ *  ---------------------------------------------------------------------------
+ *  Example #3: Game, multiple templates
+ *  ---------------------------------------------------------------------------
+ */
 
 $vt = '<div id="forest"><div id="village"><!-- paste:village --></div></div>';
 $bt = '
 	<div class="catalogue">
 		<!-- cut:tavern -->
-			<img src="tavern.gif" />
+		<img src="tavern.gif" />
 		<!-- /cut:tavern -->
 	</div>
 ';
 
-$v = new StampTE($vt);
-$b = new StampTE($bt);
+$v = new StampTE( $vt );
+$b = new StampTE( $bt );
 $tavern = $b->getTavern();
-$v->village->add($tavern);
+$v->village->add( $tavern );
 
 echo "\n\n\n".$v;
 
-
-
+exit;
