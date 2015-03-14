@@ -48,7 +48,7 @@ function testpack($name) {
 /**
  * The real testing stuff
  */
-require('StampTE.php');
+require('StampTemplateEngine/StampTE.php');
 
 use StampTemplateEngine\StampTE as StampTE;
 use StampTemplateEngine\StampTEException as StampTEException;
