@@ -599,6 +599,14 @@ class StampTE
 		} elseif ( strpos( $method, 'say' ) ===0 ) {
 			$this->inject( lcfirst( substr( $method, 3) ), call_user_func_array( $this->translator, $arguments ) );
 			return $this;
+		} elseif (strpos($method, 'show') === 0) {
+			$id = lcfirst(substr($method, 4));
+			if (isset($this->slots[$id])) {
+				$this->inject($id, $this->slots[$id]);
+			} else {
+				$this->add($this->get($id));
+			}
+			return $this;
 		}
 	}
 
