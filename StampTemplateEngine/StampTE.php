@@ -16,8 +16,8 @@
  *  Stamp t.e.
  *  The Beautiful Template Engine
  *  @author Gabor de Mooij
- *  @version 2.3
- *  @copyright 2015
+ *  @version 2.3.1
+ *  @copyright 2016
  *  @license New BSD License
  *  ---------------------------------------------------------------------------
  */
@@ -376,7 +376,7 @@ class StampTE
 			return $this;
 		}
 
-		$pattern = '/\s*<!\-\-\spaste:'.$what.'(\(([^\)]+)\))?\s\-\->/';
+		$pattern = '/\s*<!\-\-\spaste:'.$what.'(\(([^\)]+)\))?\s\-\->/u';
 
 		$this->template = preg_replace_callback( $pattern, function( $matches ) use ( $snippet, $what ) {
 			$copyOrig = $matches[0];
