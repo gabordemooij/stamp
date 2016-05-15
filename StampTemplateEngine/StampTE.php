@@ -136,12 +136,14 @@ class StampTE
 	 * two glue points: head and body and one slot: title.
 	 * 
 	 * Usage example:
-	 * 
+	 *
+	 * <code>
 	 * $tpl = StampTE::createHtml5Utf8Document();
 	 * $tpl->setTitle('Welcome to StampTE'); //set the title.
 	 * $tpl->head->add( $linkTag ); //Add stylesheets and scripts!
 	 * $tpl->body->add( $myDocument ); //Add your body content!
-	 * 
+	 * </code>
+	 *
 	 * @return StampTE template
 	 */
 	public static function createHtml5Utf8Document()
