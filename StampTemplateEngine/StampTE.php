@@ -170,8 +170,10 @@ class StampTE
 	 * be collected and stored in the internal 'sketchbook'.
 	 * They can now be used as HTML snippets like this:
 	 *
+	 * <code>
 	 * $stpl = new StampTE( $tpl );
 	 * $stpl->getX(); //where X is cut point
+	 * </code>
 	 *
 	 * @param string $tpl HTML Template
 	 * @param string $id  identification string for this template 
@@ -586,8 +588,8 @@ class StampTE
 	/**
 	 * Call interceptor.
 	 * Intercepts:
-	 *				- getX(), routes to get('X')
-	 *				- setX(Y), routes to inject('X',Y)
+	 * - getX(), routes to get('X')
+	 * - setX(Y), routes to inject('X',Y)
 	 */
 	public function __call($method, $arguments) 
 	{
