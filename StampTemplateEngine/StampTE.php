@@ -206,7 +206,7 @@ class StampTE
 			}
 		}, $this->template );
 
-		$this->template = preg_replace( '/#([^\?#]+)(\?)?#/sU', '#&$1$2#', $this->template );
+		$this->template = preg_replace( '/#([^\?\s#]+)(\?)?#/sU', '#&$1$2#', $this->template );
 	}
 	
 	/**

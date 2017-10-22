@@ -1472,6 +1472,23 @@ $dinner->plate->add( $steak );
 
 asrt( strval( $dinner ), $expectedDinnerWithSpace );
 
+$html = '<style>
+div#chaz {
+color: #900;
+background-color: #333;
+}
+</style>
+<div id="chaz">#name#</div>';
+$se = new StampTE($html);
+$se->setName('Melville');
+asrt($se->__toString(), '<style>
+div#chaz {
+color: #900;
+background-color: #333;
+}
+</style>
+<div id="chaz">Melville</div>');
+
 if ( !$XDEBUG ) exit(0);
 
 $report = xdebug_get_code_coverage();
