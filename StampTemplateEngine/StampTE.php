@@ -148,7 +148,7 @@ class StampTE
 	 */
 	public static function createHtml5Utf8Document()
 	{
-		return self::fromFile( 'html5document.html' );
+		return self::fromFile( __dir__ . '/html5document.html' );
 	}
 
 	/**
