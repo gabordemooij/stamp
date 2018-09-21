@@ -16,8 +16,8 @@
  *  Stamp t.e.
  *  The Beautiful Template Engine
  *  @author Gabor de Mooij
- *  @version 2.3.1
- *  @copyright 2016
+ *  @version 2.3.4
+ *  @copyright 2019
  *  @license New BSD License
  *  ---------------------------------------------------------------------------
  */
@@ -564,11 +564,9 @@ class StampTE
 	 */
 	protected function filter( $data )
 	{
-		//First apply HTML special chars
+		$data = iconv("UTF-8","UTF-8//IGNORE", $data);
 		$filtered = htmlspecialchars( $data, ENT_QUOTES, 'UTF-8' );
-
 		$filtered = str_replace( '`', '&#96;', $filtered ); //Prevent MSIE backtick XSS hack
-		
 		return $filtered;
 	}
 

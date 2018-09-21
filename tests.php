@@ -1489,6 +1489,22 @@ background-color: #333;
 </style>
 <div id="chaz">Melville</div>');
 
+testpack('Test high UTF-8 and invalid UTF-8');
+$se = new StampTE('<!-- cut:爱 -->♥<!-- /cut:爱 -->');
+$heart = $se->get('爱');
+$se->add( $heart );
+$se->add( $heart );
+asrt( $se->__toString(), '♥♥' );
+
+$se = new StampTE('#test#');
+$se->setTest( '𐀀' );
+asrt( $se->__toString(), '𐀀' );
+
+$se = new StampTE('#test#');
+$invalid = chr('129') . chr('129');
+$se->setTest( $invalid );
+asrt( $se->__toString(), '' );
+
 if ( !$XDEBUG ) exit(0);
 
 $report = xdebug_get_code_coverage();
