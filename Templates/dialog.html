@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="#language#">
+	<head>
+	<meta charset="utf-8">
+	<title>#title#</title>
+	<meta name="viewport" content="initial-scale=1.0,width=device-width" >
+	<style>
+		body   {
+			min-height:1000px;
+			background-color:#backgroundColor#;
+			font:#font#;
+			background-size:cover;
+			background-repeat: no-repeat;
+			background-position:center;
+			background: linear-gradient(0deg, #backgroundColor# 0%, #textColor# 100%); 
+		}
+		body,a { color:#textColor#; }
+		form   { 
+			width:calc(100% - 20px);
+			max-width:800px;
+			margin:auto;
+			margin-top:200px;
+			padding: 1px 10px 10px 10px;
+			border-radius:5px;
+			background-color:#foregroundColor#;
+			animation-name: animatetop;
+			animation-duration: 0.5s;
+			box-shadow: 0 0 20px #000;
+		}
+		h1     { text-align:center; font:#headerFont#; }
+		a,input[type=submit] { height:40px;	line-height:40px; text-align:center;}
+		hr     { background-color: #backgroundColor#; border:none; height:1px; margin-top:40px; }
+		.field { margin-bottom:10px; display:block; width:calc(100% - 10px); padding:5px; border: 1px #backgroundColor# solid; border-radius:3px; }
+		.field::placeholder { opacity:0.4; font-style:italic;  }
+		input[type=submit]   {
+			background-color:#backgroundColor#;
+			color:#textColor#;
+			display:block;
+			border:none;
+			border-radius:5px;
+			float:right;
+			margin-left:10px;
+			padding: 0 20px 0 20px;
+			cursor:pointer;
+			border: 1px transparent solid;
+		}
+		input[type=submit]:hover {
+			background-color:#foregroundColor#;
+			color:#textColor#;
+			border: 1px #backgroundColor# solid;
+		}
+		@media(max-width:600px) {
+			a,input[type=submit] { width: 100%; display:block; float:none; clear:both; margin-bottom:10px; margin-left:0; }
+			form { margin-top: 0; }
+		}
+		@keyframes animatetop {  from { opacity: 0; transform:scale(0.1); } to {opacity: 1; transform:scale(1); } }
+		input:focus {  outline: 1px solid #textColor#; }
+		#css?#	
+	</style>
+	</head>
+	<body class="custom">
+		<form method="#method#" action="#action#">
+			<h1>#title#</h1>
+			<p>#message#</p>
+			<!-- cut:field -->
+			<input title="#title?#" class="field" #autofocus?# type="#type#" name="#name#" value="#value?#" placeholder="#placeholder?#">
+			<!-- /cut:field -->
+			<hr>
+			<!-- cut:button -->
+			<input title="#label?#" type="submit" name="#name#" value="#label#">
+			<!-- /cut:button -->
+			<!-- cut:link -->
+			<a title="#label?#" href="#href#">#label#</a>
+			<!-- /cut:link -->
+		</form>
+	</body>
+</html>
