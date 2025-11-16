@@ -62,8 +62,9 @@ And.. to put some diamonds in the jewellery box:
 
 Easy!
 
-More info: http://www.stampte.com
-
+Notice November 2025:
+the Stampte.com domain no longer works.
+I am moving this project to a different site and rename it.
 
 Advantages
 ----------
